@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Курс лечения — трекер</title>
+<style>
+  :root{
+    --bg:#f3f4f6; --card:#ffffff; --ink:#111827; --muted:#6b7280; --muted2:#9ca3af;
+    --border:#e5e7eb; --border2:#f3f4f6; --blue:#3b82f6; --pink:#ec4899; --orange:#f97316; --red:#ef4444;
+    --green:#22c55e; --gray100:#f3f4f6; --gray200:#e5e7eb; --gray300:#d1d5db;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  input{font:inherit;}
+  .page{min-height:100vh; padding:24px 16px 48px;}
+  .container{max-width:420px; margin:0 auto; display:flex; flex-direction:column; gap:20px;}
+  .card{background:var(--card); border-radius:16px; box-shadow:0 1px 2px rgba(0,0,0,.04),0 1px 6px rgba(0,0,0,.04);}
+  .card-lg{border-radius:24px;}
+  .section-label{font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; padding:0 4px; margin:0 0 6px;}
+  h1.title{font-size:28px; font-weight:700; letter-spacing:-0.02em; margin:0;}
+  .sub{font-size:14px; color:var(--muted); margin:4px 0 0;}
+  .storage-note{font-size:11px; color:var(--muted2); margin:6px 0 0; line-height:1.4;}
+  .toolbar{display:flex; align-items:flex-start; gap:2px; flex-shrink:0;}
+  .icon-btn{padding:6px; color:var(--muted2); background:none; border:none; border-radius:8px; display:flex; align-items:center;}
+  .icon-btn:hover{color:var(--muted);}
+  .row-between{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
+  .progress-row{display:flex; align-items:center; gap:12px; margin-top:12px;}
+  .progress-track{flex:1; height:6px; border-radius:99px; background:var(--gray200); overflow:hidden;}
+  .progress-fill{height:100%; background:var(--blue); border-radius:99px; transition:width .3s;}
+  .progress-pct{font-size:12px; font-weight:600; color:var(--muted); flex-shrink:0;}
+  .field-row{display:flex; align-items:center; gap:6px; font-size:14px; color:var(--muted); margin-top:10px; flex-wrap:wrap;}
+  .field-row input[type=date], .field-row input[type=number]{
+    border:1px solid var(--gray300); border-radius:8px; padding:4px 8px; font-size:16px; color:var(--ink); background:#fff;
+  }
+  .sleep-row{display:flex; align-items:center; gap:8px;}
+  .sleep-input{width:110px; border:1px solid var(--gray300); border-radius:10px; padding:10px 12px; font-size:16px; color:var(--ink);}
+  .sleep-unit{font-size:14px; color:var(--muted);}
+  .field-row input[type=number]{width:60px;}
+  .stock-group{display:flex; align-items:center; gap:6px;}
+  .stock-label{font-weight:600; color:var(--ink);}
+  .ml-auto{margin-left:auto;}
+  .reminder{padding:14px; display:flex; align-items:center; gap:12px;}
+  .reminder-icon{width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;}
+  .bg-orange{background:var(--orange);}
+  .bg-red{background:var(--red);}
+  .reminder-title{font-size:14px; font-weight:600; color:var(--ink);}
+  .reminder-sub{font-size:12px; color:var(--muted); margin-top:2px;}
+  .reminder-sub.urgent{color:var(--red); font-weight:600;}
+  .today-card{padding:16px;}
+  .today-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px;}
+  .today-head h2{font-size:15px; font-weight:600; margin:0;}
+  .today-date{font-size:12px; color:var(--muted2);}
+  .dose-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .slot-label{font-size:11px; font-weight:600; color:var(--muted2); text-transform:uppercase; letter-spacing:.04em; text-align:center;}
+  .span2{grid-column:span 2;}
+  .capsule-wrap{display:flex; justify-content:center;}
+  .capsule{border-radius:99px; display:flex; align-items:center; justify-content:center; background:#fff; border:2px solid var(--gray300); color:var(--muted2); flex-shrink:0;}
+  .capsule-lg{width:56px; height:56px;}
+  .capsule-sm{width:32px; height:32px; border-width:1px;}
+  .capsule-z{border-color:#bfdbfe; color:#60a5fa;}
+  .capsule-a{border-color:#fbcfe8; color:#f472b6;}
+  .capsule-z.capsule-on{background:var(--blue); border-color:var(--blue); color:#fff;}
+  .capsule-a.capsule-on{background:var(--pink); border-color:var(--pink); color:#fff;}
+  .capsule-num{font-size:13px; font-weight:600;}
+  .capsule-sm .capsule-num{font-size:11px;}
+  .check-icon{width:22px; height:22px;}
+  .capsule-sm .check-icon{width:14px; height:14px;}
+  .cap-tag{text-align:center; font-size:11px; color:var(--muted); margin-top:0;}
+  .today-note{font-size:11px; color:var(--muted2); margin:10px 0 0;}
+  .stats-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .stat-card{padding:12px; border-radius:16px;}
+  .stat-value{font-size:22px; font-weight:700; color:var(--ink);}
+  .stat-label{font-size:12px; color:var(--muted); margin-top:2px;}
+  .stat-sub{font-size:11px; color:var(--muted2); margin-top:2px;}
+  .stat-warn{font-size:11px; color:var(--red); font-weight:600; margin-top:4px;}
+  .grouped{border-radius:16px; overflow:hidden;}
+  .grouped > * + *{border-top:1px solid var(--border2);}
+  .week-head{width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:none; border:none; text-align:left;}
+  .week-title{font-size:14px; font-weight:600; color:var(--ink);}
+  .week-range{font-weight:400; color:var(--muted2);}
+  .week-count{font-size:12px; color:var(--muted2);}
+  .week-body{background:#f9fafb;}
+  .week-body > * + *{border-top:1px solid var(--border2);}
+  .day-row{display:flex; align-items:center; justify-content:space-between; padding:10px 14px;}
+  .day-info{font-size:11px;}
+  .day-num{font-weight:600; color:var(--ink);}
+  .day-date{color:var(--muted2);}
+  .day-badge{margin-top:2px;}
+  .day-badge.orange{color:var(--orange);}
+  .day-badge.red{color:var(--red);}
+  .caps-row{display:flex; gap:6px;}
+  .journal-list{padding:0 14px;}
+  .journal-row{display:flex; align-items:center; justify-content:space-between; font-size:12px; padding:10px 0;}
+  .journal-row + .journal-row{border-top:1px solid var(--border2);}
+  .journal-time{color:var(--muted2); flex-shrink:0; margin-left:8px;}
+  .empty-note{font-size:14px; color:var(--muted2); padding:4px 0;}
+  .chart-toggle{width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:none; border:none; text-align:left;}
+  .chart-avg{display:flex; gap:16px; font-size:12px; color:var(--muted); margin-bottom:10px;}
+  .chart-avg b{color:var(--ink); font-weight:600;}
+  .legend{display:flex; gap:14px; font-size:11px; color:var(--muted); margin-bottom:4px;}
+  .legend span{display:inline-flex; align-items:center; gap:4px;}
+  .dot{width:8px; height:8px; border-radius:99px; display:inline-block; vertical-align:middle;}
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; padding:16px; z-index:50;}
+  .modal{width:100%; max-width:360px; background:#fff; border-radius:24px; padding:20px; display:flex; flex-direction:column; gap:16px;}
+  .modal h3{margin:0; font-size:17px; font-weight:700;}
+  .modal .sub{margin-top:2px;}
+  .scale-label{font-size:14px; font-weight:600; color:var(--ink); margin:0 0 8px;}
+  .scale-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:8px;}
+  .scale-btn{height:40px; border-radius:10px; border:none; background:var(--gray100); color:#374151; font-weight:600; font-size:14px;}
+  .scale-btn.selected{background:var(--blue); color:#fff;}
+  .modal-actions{display:flex; gap:8px; padding-top:2px;}
+  .btn-flat{flex:1; padding:10px; border-radius:12px; border:none; font-size:14px; font-weight:600;}
+  .btn-secondary{background:var(--gray100); color:#374151;}
+  .btn-primary{background:var(--blue); color:#fff;}
+  .btn-primary[disabled]{background:var(--gray300); color:#fff;}
+  .btn-danger{background:var(--red); color:#fff;}
+  .reset-row{width:100%; display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border:none; background:transparent; color:var(--red); font-size:13px; font-weight:600;}
+</style>
+</head>
+<body>
+  <div id="app"></div>
+  <input type="file" id="import-file" accept="application/json" style="display:none">
+<script>
+"use strict";
+
+/* ---------------- constants ---------------- */
+var STORAGE_KEY = 'med-course-v1';
+var COURSE_LENGTH = 35;
+var DOCTOR_VISIT_ISO = '2026-09-27';
+var DOCTOR_VISIT_TIME = '10:00';
+var DEFAULT_STOCK_Z = 56;
+var DEFAULT_STOCK_A = 50;
+
+/* ---------------- icons (inline SVG, no dependencies) ---------------- */
+var ICON = {
+  chevronDown: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>',
+  chevronUp: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  stetho: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a4 4 0 008 0V3"/><path d="M6 3H4M14 3h2"/><path d="M10 13v2a5 5 0 0010 0v-1.5"/><circle cx="20" cy="13.2" r="1.6"/></svg>',
+  pill: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="9" width="15" height="6" rx="3" transform="rotate(-40 12 12)"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+  reset: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.7 9.7 0 00-6.7 2.7L3 8"/><path d="M3 3v5h5"/></svg>',
+  download: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9m0 0l-4 4m4-4l4 4"/><path d="M4 3h16"/></svg>',
+  check: '<svg viewBox="0 0 24 24" class="check-icon" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>'
+};
+
+/* ---------------- date helpers (local-time safe) ---------------- */
+function dateFromISO(iso){ var p=iso.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); }
+function isoFromDate(d){ var y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+dd; }
+function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+function shortDate(d){ return d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})+', '+d.toLocaleDateString('ru-RU',{weekday:'short'}); }
+function longDate(d){ return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}); }
+function formatNum(n){ var s=n.toFixed(1); return s.endsWith('.0')? s.slice(0,-2): s; }
+function average(a){ if(!a.length) return 0; return a.reduce(function(x,y){return x+y;},0)/a.length; }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+/* ---------------- schedule / stats / reminders (same logic as before) ---------------- */
+function generateSchedule(startISO){
+  var start = dateFromISO(startISO);
+  var days = [];
+  for (var i=0;i<COURSE_LENGTH;i++){
+    var date = addDays(start,i);
+    var dayNumber = i+1;
+    var iso = isoFromDate(date);
+    var zAmount = dayNumber<=5 ? 0.5 : 1;
+    var doses = [
+      {id:'d'+dayNumber+'-z-morning', pill:'З', slot:'Утро', amount:zAmount},
+      {id:'d'+dayNumber+'-a-morning', pill:'А', slot:'Утро', amount:0.5},
+      {id:'d'+dayNumber+'-a-afternoon', pill:'А', slot:'День', amount:0.5},
+      {id:'d'+dayNumber+'-a-evening', pill:'А', slot:'Вечер', amount:1}
+    ];
+    days.push({dayNumber:dayNumber, iso:iso, date:date, doses:doses, isDoctorVisit: iso===DOCTOR_VISIT_ISO});
+  }
+  return days;
+}
+function computeStats(days, taken){
+  var totalZ=0, totalA=0, takenZ=0, takenA=0, totalDoses=0, takenDoses=0, daysWithAny=0, daysFull=0;
+  days.forEach(function(day){
+    var dayTaken=0;
+    day.doses.forEach(function(dose){
+      totalDoses++;
+      if (dose.pill==='З') totalZ+=dose.amount; else totalA+=dose.amount;
+      if (taken[dose.id]){
+        takenDoses++; dayTaken++;
+        if (dose.pill==='З') takenZ+=dose.amount; else takenA+=dose.amount;
+      }
+    });
+    if (dayTaken>0) daysWithAny++;
+    if (dayTaken===day.doses.length) daysFull++;
+  });
+  return {totalZ:totalZ,totalA:totalA,takenZ:takenZ,takenA:takenA,totalDoses:totalDoses,takenDoses:takenDoses,daysWithAny:daysWithAny,daysFull:daysFull};
+}
+function computeReminder(pillLabel, stock, days, todayISO){
+  var cumulative=0, depletionDay=null;
+  for (var i=0;i<days.length;i++){
+    var day = days[i];
+    var amt = day.doses.filter(function(d){return d.pill===pillLabel;}).reduce(function(a,d){return a+d.amount;},0);
+    cumulative += amt;
+    if (cumulative >= stock){ depletionDay = day.dayNumber; break; }
+  }
+  if (depletionDay===null) return null;
+  var depletionDate = days[depletionDay-1].date;
+  var daysUntil = Math.round((depletionDate - dateFromISO(todayISO))/86400000);
+  var refillDay = Math.max(1, depletionDay-7);
+  return {depletionDay:depletionDay, depletionDate:depletionDate, daysUntil:daysUntil, refillDay:refillDay};
+}
+
+/* ---------------- lightweight dependency-free SVG line chart ---------------- */
+function buildMoodChartSVG(entries){
+  var W=320,H=190,padL=26,padR=8,padT=10,padB=22;
+  var innerW=W-padL-padR, innerH=H-padT-padB;
+  var n=entries.length;
+  function x(i){ return padL + (n===1 ? innerW/2 : (innerW*i)/(n-1)); }
+  function y(v){ return padT + innerH - ((v-1)/9)*innerH; }
+  var ptsFeeling = entries.map(function(e,i){return x(i)+','+y(e.feeling);}).join(' ');
+  var ptsMood = entries.map(function(e,i){return x(i)+','+y(e.mood);}).join(' ');
+  var grid = [1,5,10].map(function(v){
+    return '<line x1="'+padL+'" y1="'+y(v)+'" x2="'+(W-padR)+'" y2="'+y(v)+'" stroke="#e5e7eb" stroke-width="1"/>'+
+           '<text x="'+(padL-5)+'" y="'+(y(v)+3)+'" font-size="9" fill="#9ca3af" text-anchor="end">'+v+'</text>';
+  }).join('');
+  var dotsF = entries.map(function(e,i){return '<circle cx="'+x(i)+'" cy="'+y(e.feeling)+'" r="2.5" fill="#3b82f6"/>';}).join('');
+  var dotsM = entries.map(function(e,i){return '<circle cx="'+x(i)+'" cy="'+y(e.mood)+'" r="2.5" fill="#f97316"/>';}).join('');
+  var step = n<=7 ? 1 : (n<=14 ? 2 : Math.ceil(n/7));
+  var labels = entries.map(function(e,i){
+    if (i%step!==0 && i!==n-1) return '';
+    var lbl = e.date.toLocaleDateString('ru-RU',{day:'numeric',month:'numeric'});
+    return '<text x="'+x(i)+'" y="'+(H-6)+'" font-size="9" fill="#9ca3af" text-anchor="middle">'+lbl+'</text>';
+  }).join('');
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="200" preserveAspectRatio="xMidYMid meet">'+
+    grid+
+    '<polyline points="'+ptsFeeling+'" fill="none" stroke="#3b82f6" stroke-width="2"/>'+
+    '<polyline points="'+ptsMood+'" fill="none" stroke="#f97316" stroke-width="2"/>'+
+    dotsF+dotsM+labels+
+  '</svg>';
+}
+
+function buildSleepChartSVG(entries){
+  var W=320,H=190,padL=26,padR=8,padT=10,padB=22;
+  var innerW=W-padL-padR, innerH=H-padT-padB;
+  var n=entries.length;
+  var dataMax = entries.reduce(function(m,e){return Math.max(m, e.sleepHours);}, 0);
+  var maxY = Math.max(12, Math.ceil(dataMax));
+  function x(i){ return padL + (n===1 ? innerW/2 : (innerW*i)/(n-1)); }
+  function yFor(v){ return padT + innerH - (v/maxY)*innerH; }
+  var ticks = [0, Math.round(maxY/2), maxY];
+  var grid = ticks.map(function(v){
+    return '<line x1="'+padL+'" y1="'+yFor(v)+'" x2="'+(W-padR)+'" y2="'+yFor(v)+'" stroke="#e5e7eb" stroke-width="1"/>'+
+           '<text x="'+(padL-5)+'" y="'+(yFor(v)+3)+'" font-size="9" fill="#9ca3af" text-anchor="end">'+v+'</text>';
+  }).join('');
+  var barW = n>0 ? Math.min(24, (innerW/n)*0.55) : 10;
+  var bars = entries.map(function(e,i){
+    var bx = x(i) - barW/2;
+    var by = yFor(e.sleepHours);
+    var bh = Math.max(0, (padT+innerH) - by);
+    return '<rect x="'+bx+'" y="'+by+'" width="'+barW+'" height="'+bh+'" rx="3" fill="#8b5cf6"/>';
+  }).join('');
+  var step = n<=7 ? 1 : (n<=14 ? 2 : Math.ceil(n/7));
+  var labels = entries.map(function(e,i){
+    if (i%step!==0 && i!==n-1) return '';
+    var lbl = e.date.toLocaleDateString('ru-RU',{day:'numeric',month:'numeric'});
+    return '<text x="'+x(i)+'" y="'+(H-6)+'" font-size="9" fill="#9ca3af" text-anchor="middle">'+lbl+'</text>';
+  }).join('');
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="200" preserveAspectRatio="xMidYMid meet">'+grid+bars+labels+'</svg>';
+}
+
+/* ---------------- persistence (synchronous localStorage — no network, no loader) ---------------- */
+function defaultData(){
+  return { startDate: isoFromDate(new Date()), taken:{}, stockZ:DEFAULT_STOCK_Z, stockA:DEFAULT_STOCK_A, moodLog:{} };
+}
+function loadData(){
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw){
+      var p = JSON.parse(raw);
+      return {
+        startDate: p.startDate || isoFromDate(new Date()),
+        taken: p.taken || {},
+        stockZ: typeof p.stockZ === 'number' ? p.stockZ : DEFAULT_STOCK_Z,
+        stockA: typeof p.stockA === 'number' ? p.stockA : DEFAULT_STOCK_A,
+        moodLog: p.moodLog || {}
+      };
+    }
+  } catch(e){ console.error('load failed', e); }
+  return defaultData();
+}
+function saveData(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  catch(e){ console.error('save failed', e); alert('Не удалось сохранить в этом браузере (нет места или хранилище отключено).'); }
+}
+
+var data = loadData();
+var ui = { openWeek:0, moodChartOpen:false, moodPromptDay:null, moodDraftFeeling:null, moodDraftMood:null, moodDraftSleep:null, showResetConfirm:false };
+(function initWeek(){
+  var dayNum = Math.round((dateFromISO(isoFromDate(new Date())) - dateFromISO(data.startDate))/86400000)+1;
+  ui.openWeek = Math.min(4, Math.max(0, Math.floor((dayNum-1)/7)));
+})();
+
+/* ---------------- render helpers ---------------- */
+function pillLetterHTML(pillLabel){
+  var cls = pillLabel==='З' ? 'pill-text-z' : 'pill-text-a';
+  var color = pillLabel==='З' ? '#3b82f6' : '#ec4899';
+  return '<span class="'+cls+'" style="color:'+color+';font-weight:600">'+pillLabel+'</span>';
+}
+function capsuleHTML(dose, dayIso, isTaken, size){
+  var big = size==='lg';
+  var pillClass = dose.pill==='З' ? 'capsule-z' : 'capsule-a';
+  var inner = isTaken ? ICON.check : '<span class="capsule-num">'+formatNum(dose.amount)+'</span>';
+  return '<button type="button" class="capsule '+pillClass+' '+(big?'capsule-lg':'capsule-sm')+' '+(isTaken?'capsule-on':'')+
+    '" data-action="toggle-dose" data-dose-id="'+dose.id+'" data-day-iso="'+dayIso+'" data-slot="'+dose.slot+
+    '" aria-label="'+dose.pill+' '+dose.slot+' '+formatNum(dose.amount)+'">'+inner+'</button>';
+}
+
+function reminderCardHTML(pillLabel, reminder, prescription){
+  var urgent = reminder.daysUntil<=7, overdue = reminder.daysUntil<0;
+  var bg = urgent ? 'bg-red' : 'bg-orange';
+  var title, sub, subClass='';
+  var coloredLabel = pillLetterHTML(pillLabel);
+  if (overdue){
+    title = 'Запас «'+coloredLabel+'», похоже, уже закончился';
+    sub = prescription ? 'Если рецепт ещё не продлён — запишитесь к врачу' : 'Пора пополнить запас';
+    subClass='urgent';
+  } else if (urgent){
+    title = 'Запас «'+coloredLabel+'» закончится через '+reminder.daysUntil+' дн.';
+    sub = prescription ? 'Запишитесь к врачу за новым рецептом' : 'Пора пополнить запас';
+    subClass='urgent';
+  } else {
+    title = 'Запас «'+coloredLabel+'» — до дня '+reminder.depletionDay+' ('+shortDate(reminder.depletionDate)+')';
+    sub = 'Осталось ~'+reminder.daysUntil+' дн. запаса'+(prescription?' · рецептурный препарат':'');
+  }
+  return '<div class="card reminder"><div class="reminder-icon '+bg+'">'+ICON.pill+'</div>'+
+    '<div><div class="reminder-title">'+title+'</div><div class="reminder-sub '+subClass+'">'+sub+'</div></div></div>';
+}
+
+function render(){
+  var days = generateSchedule(data.startDate);
+  var stats = computeStats(days, data.taken);
+  var today = new Date();
+  var todayISO = isoFromDate(today);
+  var currentDayNumber = Math.round((dateFromISO(todayISO) - dateFromISO(data.startDate))/86400000)+1;
+  var currentDay = days.filter(function(d){return d.iso===todayISO;})[0];
+  var endDate = days[days.length-1].date;
+  var progressPct = stats.totalDoses>0 ? Math.round((stats.takenDoses/stats.totalDoses)*100) : 0;
+  var daysUntilVisit = Math.round((dateFromISO(DOCTOR_VISIT_ISO) - dateFromISO(todayISO))/86400000);
+  var reminderZ = computeReminder('З', data.stockZ, days, todayISO);
+  var reminderA = computeReminder('А', data.stockA, days, todayISO);
+  var stockRemainingZ = data.stockZ - stats.takenZ;
+  var stockRemainingA = data.stockA - stats.takenA;
+  var warnZ = stats.totalZ > data.stockZ ? 'запаса не хватит на весь курс' : null;
+  var warnA = stats.totalA > data.stockA ? 'запаса не хватит на весь курс' : null;
+
+  var journal = Object.keys(data.taken).map(function(id){
+    for (var i=0;i<days.length;i++){
+      var dose = days[i].doses.filter(function(d){return d.id===id;})[0];
+      if (dose) return {id:id, ts:data.taken[id], day:days[i], dose:dose};
+    }
+    return null;
+  }).filter(Boolean).sort(function(a,b){return new Date(b.ts)-new Date(a.ts);}).slice(0,8);
+
+  var moodEntries = Object.keys(data.moodLog).map(function(iso){
+    var v = data.moodLog[iso];
+    if (!v || v.feeling==null || v.mood==null) return null;
+    return {iso:iso, date:dateFromISO(iso), feeling:v.feeling, mood:v.mood};
+  }).filter(Boolean).sort(function(a,b){return a.date-b.date;});
+  var avgFeeling = average(moodEntries.map(function(e){return e.feeling;}));
+  var avgMood = average(moodEntries.map(function(e){return e.mood;}));
+
+  var sleepEntries = Object.keys(data.moodLog).map(function(iso){
+    var v = data.moodLog[iso];
+    if (!v || v.sleepHours==null) return null;
+    return {iso:iso, date:dateFromISO(iso), sleepHours:v.sleepHours};
+  }).filter(Boolean).sort(function(a,b){return a.date-b.date;});
+  var avgSleep = average(sleepEntries.map(function(e){return e.sleepHours;}));
+
+  var weeks = [0,1,2,3,4].map(function(w){return days.slice(w*7, w*7+7);});
+
+  /* header */
+  var headerHTML =
+    '<div>'+
+      '<div class="row-between">'+
+        '<div><h1 class="title">Курс лечения</h1><p class="sub">'+longDate(dateFromISO(data.startDate))+' – '+longDate(endDate)+'</p></div>'+
+        '<div class="toolbar">'+
+          '<button class="icon-btn" data-action="export-data" title="Экспорт (резервная копия)">'+ICON.download+'</button>'+
+          '<button class="icon-btn" data-action="trigger-import" title="Импорт из файла">'+ICON.upload+'</button>'+
+          '<button class="icon-btn" data-action="open-reset-confirm" title="Сбросить всю историю">'+ICON.reset+'</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="progress-row"><div class="progress-track"><div class="progress-fill" style="width:'+progressPct+'%"></div></div><span class="progress-pct">'+progressPct+'%</span></div>'+
+      '<div class="field-row">'+ICON.calendar+'<label for="start-date">Начало курса</label>'+
+        '<input id="start-date" type="date" value="'+data.startDate+'" data-field="startDate" class="ml-auto">'+
+      '</div>'+
+      '<div class="field-row"><span style="text-transform:uppercase;font-size:11px;color:var(--muted2)">Запас</span>'+
+        '<div class="stock-group"><span class="stock-label">З</span><input type="number" min="0" value="'+data.stockZ+'" data-field="stockZ"></div>'+
+        '<div class="stock-group"><span class="stock-label">А</span><input type="number" min="0" value="'+data.stockA+'" data-field="stockA"></div>'+
+      '</div>'+
+      '<p class="storage-note">Данные хранятся локально в этом браузере/устройстве. «Экспорт» — резервная копия или перенос на другое устройство.</p>'+
+    '</div>';
+
+  /* reminders */
+  var doctorSub = daysUntilVisit>0 ? ('Через '+daysUntilVisit+' дн.') : (daysUntilVisit===0 ? 'Сегодня' : 'Уже прошёл');
+  var remindersHTML =
+    '<div><div class="section-label">Напоминания</div><div style="display:flex;flex-direction:column;gap:8px">'+
+      '<div class="card reminder"><div class="reminder-icon bg-orange">'+ICON.stetho+'</div>'+
+        '<div><div class="reminder-title">Визит к врачу — 27 сентября, '+DOCTOR_VISIT_TIME+'</div><div class="reminder-sub">'+doctorSub+'</div></div></div>'+
+      (reminderA ? reminderCardHTML('А', reminderA, true) : '')+
+      (reminderZ ? reminderCardHTML('З', reminderZ, false) : '')+
+    '</div></div>';
+
+  /* today card */
+  var todayInner = '';
+  if (currentDayNumber<1){
+    todayInner = '<p class="empty-note">Курс начнётся '+longDate(dateFromISO(data.startDate))+' — через '+(1-currentDayNumber)+' дн.</p>';
+  } else if (currentDayNumber>COURSE_LENGTH){
+    todayInner = '<p class="empty-note">Курс завершён '+longDate(endDate)+'. 🎉</p>';
+  } else if (currentDay){
+    var capsRow = currentDay.doses.map(function(dose){return '<div class="capsule-wrap">'+capsuleHTML(dose, currentDay.iso, !!data.taken[dose.id], 'lg')+'</div>';}).join('');
+    var tagsRow = currentDay.doses.map(function(dose){return '<div class="cap-tag">'+pillLetterHTML(dose.pill)+'·'+formatNum(dose.amount)+'</div>';}).join('');
+    todayInner =
+      '<div class="today-head"><h2>Сегодня · день '+currentDay.dayNumber+' из '+COURSE_LENGTH+'</h2><span class="today-date">'+shortDate(currentDay.date)+'</span></div>'+
+      '<div class="dose-grid">'+
+        '<div class="slot-label span2">Утро</div><div class="slot-label">День</div><div class="slot-label">Вечер</div>'+
+        capsRow+tagsRow+
+      '</div>'+
+      '<p class="today-note">Утро — после еды · Вечер — 18:00–19:00 · утренняя отметка запускает чек-ин самочувствия</p>';
+  }
+  var todayHTML = '<div class="card card-lg today-card">'+todayInner+'</div>';
+
+  /* stats */
+  var statsHTML =
+    '<div><div class="section-label">Прогресс</div><div class="stats-grid">'+
+      '<div class="card stat-card"><div class="stat-value">'+formatNum(stats.takenZ)+' / '+formatNum(stats.totalZ)+'</div><div class="stat-label"><span class="dot" style="background:#3b82f6;margin-right:5px"></span>Таблетка З</div><div class="stat-sub">в наличии: '+formatNum(stockRemainingZ)+'</div>'+(warnZ?'<div class="stat-warn">'+warnZ+'</div>':'')+'</div>'+
+      '<div class="card stat-card"><div class="stat-value">'+formatNum(stats.takenA)+' / '+formatNum(stats.totalA)+'</div><div class="stat-label"><span class="dot" style="background:#ec4899;margin-right:5px"></span>Таблетка А</div><div class="stat-sub">в наличии: '+formatNum(stockRemainingA)+'</div>'+(warnA?'<div class="stat-warn">'+warnA+'</div>':'')+'</div>'+
+      '<div class="card stat-card"><div class="stat-value">'+stats.daysWithAny+' / '+COURSE_LENGTH+'</div><div class="stat-label">Дней с приёмами</div><div class="stat-sub">полностью: '+stats.daysFull+'</div></div>'+
+      '<div class="card stat-card"><div class="stat-value">'+((currentDayNumber>=1&&currentDayNumber<=COURSE_LENGTH)?(currentDayNumber+' / '+COURSE_LENGTH):'—')+'</div><div class="stat-label">День курса</div>'+((currentDayNumber>=1&&currentDayNumber<=COURSE_LENGTH)?('<div class="stat-sub">осталось дней: '+(COURSE_LENGTH-currentDayNumber+1)+'</div>'):'')+'</div>'+
+    '</div></div>';
+
+  /* weeks accordion */
+  var weeksHTML = '<div><div class="section-label">Календарь курса</div><div class="card grouped">'+
+    weeks.map(function(weekDays, w){
+      var weekTaken=0, weekTotal=0;
+      weekDays.forEach(function(d){ weekTotal+=d.doses.length; weekTaken += d.doses.filter(function(x){return data.taken[x.id];}).length; });
+      var isOpen = ui.openWeek===w;
+      var body = '';
+      if (isOpen){
+        body = '<div class="week-body">'+weekDays.map(function(day){
+          var badges='';
+          if (day.isDoctorVisit) badges += '<div class="day-badge orange">Врач · '+DOCTOR_VISIT_TIME+'</div>';
+          if (reminderA && day.dayNumber===reminderA.refillDay) badges += '<div class="day-badge red">Запись к врачу за «'+pillLetterHTML('А')+'»</div>';
+          if (reminderZ && day.dayNumber===reminderZ.refillDay) badges += '<div class="day-badge orange">Пополнить «'+pillLetterHTML('З')+'»</div>';
+          var caps = day.doses.map(function(dose){return capsuleHTML(dose, day.iso, !!data.taken[dose.id], 'sm');}).join('');
+          return '<div class="day-row"><div class="day-info"><div class="day-num">День '+day.dayNumber+'</div><div class="day-date">'+shortDate(day.date)+'</div>'+badges+'</div><div class="caps-row">'+caps+'</div></div>';
+        }).join('')+'</div>';
+      }
+      return '<div><button class="week-head" data-action="toggle-week" data-week="'+w+'">'+
+        '<span class="week-title">Неделя '+(w+1)+' <span class="week-range">· '+shortDate(weekDays[0].date)+' – '+shortDate(weekDays[weekDays.length-1].date)+'</span></span>'+
+        '<span style="display:flex;align-items:center;gap:8px"><span class="week-count">'+weekTaken+'/'+weekTotal+'</span>'+(isOpen?ICON.chevronUp:ICON.chevronDown)+'</span>'+
+        '</button>'+body+'</div>';
+    }).join('')+
+  '</div></div>';
+
+  /* journal */
+  var journalHTML = '';
+  if (journal.length>0){
+    journalHTML = '<div><div class="section-label">Журнал приёмов</div><div class="card journal-list">'+
+      journal.map(function(entry){
+        var t = new Date(entry.ts).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+        return '<div class="journal-row"><span>День '+entry.day.dayNumber+' · '+pillLetterHTML(entry.dose.pill)+' · '+entry.dose.slot+' · '+formatNum(entry.dose.amount)+'</span><span class="journal-time">'+t+'</span></div>';
+      }).join('')+
+    '</div></div>';
+  }
+
+  /* mood chart (hidden section, collapsed by default) */
+  var chartBody = '';
+  if (moodEntries.length===0){
+    chartBody = '<p class="empty-note" style="color:var(--muted2)">Пока нет данных. Чек-ин появится при первой отметке утренней таблетки.</p>';
+  } else {
+    chartBody = '<div class="chart-avg"><span>Ср. самочувствие: <b>'+formatNum(avgFeeling)+'</b></span><span>Ср. настроение: <b>'+formatNum(avgMood)+'</b></span></div>'+
+      '<div class="legend"><span><i class="dot" style="background:#3b82f6"></i>Самочувствие</span><span><i class="dot" style="background:#f97316"></i>Настроение</span></div>'+
+      buildMoodChartSVG(moodEntries);
+  }
+  var sleepBody = '';
+  if (sleepEntries.length===0){
+    sleepBody = '<p class="empty-note" style="color:var(--muted2)">Пока нет данных о сне.</p>';
+  } else {
+    sleepBody = '<div class="chart-avg"><span>Ср. сон: <b>'+formatNum(avgSleep)+' ч</b></span></div>'+buildSleepChartSVG(sleepEntries);
+  }
+  var moodChartHTML = '<div><button class="card chart-toggle" data-action="toggle-mood-chart" style="width:100%">'+
+    '<span class="week-title">Динамика самочувствия и сна</span>'+(ui.moodChartOpen?ICON.chevronUp:ICON.chevronDown)+
+    '</button>'+(ui.moodChartOpen ? (
+      '<div class="card" style="margin-top:8px;padding:16px">'+chartBody+'</div>'+
+      '<div class="card" style="margin-top:8px;padding:16px"><div class="section-label" style="margin-bottom:10px">Сон</div>'+sleepBody+'</div>'
+    ) : '')+'</div>';
+
+  var appHTML =
+    '<div class="page"><div class="container">'+
+      headerHTML+remindersHTML+todayHTML+statsHTML+weeksHTML+journalHTML+moodChartHTML+
+    '</div>'+
+
+    (ui.moodPromptDay ?
+      '<div class="overlay"><div class="modal">'+
+        '<div><h3>Утренний чек-ин</h3><p class="sub">'+longDate(dateFromISO(ui.moodPromptDay))+'</p></div>'+
+        '<div><p class="scale-label">Как ты себя чувствуешь сегодня?</p><div class="scale-grid">'+
+          [1,2,3,4,5,6,7,8,9,10].map(function(n){return '<button type="button" class="scale-btn'+(ui.moodDraftFeeling===n?' selected':'')+'" data-action="scale-select" data-question="feeling" data-value="'+n+'">'+n+'</button>';}).join('')+
+        '</div></div>'+
+        '<div><p class="scale-label">Какое у тебя настроение с утра?</p><div class="scale-grid">'+
+          [1,2,3,4,5,6,7,8,9,10].map(function(n){return '<button type="button" class="scale-btn'+(ui.moodDraftMood===n?' selected':'')+'" data-action="scale-select" data-question="mood" data-value="'+n+'">'+n+'</button>';}).join('')+
+        '</div></div>'+
+        '<div><p class="scale-label">Сколько часов ты спал(а) сегодня?</p>'+
+          '<div class="sleep-row"><input type="number" step="0.5" min="0" max="24" inputmode="decimal" class="sleep-input" placeholder="напр. 7.5" data-mood-field="sleepHours" value="'+(ui.moodDraftSleep!=null?ui.moodDraftSleep:'')+'"><span class="sleep-unit">часов (необязательно)</span></div>'+
+        '</div>'+
+        '<div class="modal-actions"><button type="button" class="btn-flat btn-secondary" data-action="mood-skip">Пропустить</button>'+
+        '<button type="button" class="btn-flat btn-primary" data-action="mood-save" '+((ui.moodDraftFeeling==null||ui.moodDraftMood==null)?'disabled':'')+'>Сохранить</button></div>'+
+      '</div></div>' : '')+
+
+    (ui.showResetConfirm ?
+      '<div class="overlay"><div class="modal">'+
+        '<div><h3>Стереть всю историю?</h3><p class="sub">Удалятся все отметки приёма и чек-ины самочувствия (график тоже очистится). Это действие нельзя отменить.</p></div>'+
+        '<div class="modal-actions"><button type="button" class="btn-flat btn-secondary" data-action="close-reset-confirm">Отмена</button>'+
+        '<button type="button" class="btn-flat btn-danger" data-action="confirm-reset">Стереть всё</button></div>'+
+      '</div></div>' : '');
+
+  document.getElementById('app').innerHTML = appHTML;
+}
+
+/* ---------------- export / import ---------------- */
+function exportData(){
+  var blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'med-tracker-backup-'+isoFromDate(new Date())+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------- event delegation (attached once; survives re-renders) ---------------- */
+document.getElementById('app').addEventListener('click', function(e){
+  var el = e.target.closest('[data-action]');
+  if (!el) return;
+  var action = el.dataset.action;
+  if (action==='toggle-dose'){
+    var doseId = el.dataset.doseId, dayIso = el.dataset.dayIso, slot = el.dataset.slot;
+    var willBeTaken = !data.taken[doseId];
+    if (data.taken[doseId]) delete data.taken[doseId]; else data.taken[doseId] = new Date().toISOString();
+    saveData();
+    if (willBeTaken && slot==='Утро' && !data.moodLog[dayIso]){
+      ui.moodPromptDay = dayIso; ui.moodDraftFeeling = null; ui.moodDraftMood = null; ui.moodDraftSleep = null;
+    }
+    render();
+  } else if (action==='toggle-week'){
+    var w = Number(el.dataset.week);
+    ui.openWeek = ui.openWeek===w ? -1 : w;
+    render();
+  } else if (action==='toggle-mood-chart'){
+    ui.moodChartOpen = !ui.moodChartOpen; render();
+  } else if (action==='open-reset-confirm'){
+    ui.showResetConfirm = true; render();
+  } else if (action==='close-reset-confirm'){
+    ui.showResetConfirm = false; render();
+  } else if (action==='confirm-reset'){
+    data.taken = {}; data.moodLog = {}; saveData(); ui.showResetConfirm = false; render();
+  } else if (action==='scale-select'){
+    var q = el.dataset.question, v = Number(el.dataset.value);
+    if (q==='feeling') ui.moodDraftFeeling = v; else ui.moodDraftMood = v;
+    render();
+  } else if (action==='mood-save'){
+    if (ui.moodDraftFeeling==null || ui.moodDraftMood==null) return;
+    var sleepVal = null;
+    if (ui.moodDraftSleep != null && ui.moodDraftSleep !== ''){
+      var sn = parseFloat(ui.moodDraftSleep);
+      if (!isNaN(sn) && sn >= 0) sleepVal = sn;
+    }
+    data.moodLog[ui.moodPromptDay] = {feeling:ui.moodDraftFeeling, mood:ui.moodDraftMood, sleepHours:sleepVal, ts:new Date().toISOString()};
+    saveData(); ui.moodPromptDay = null; render();
+  } else if (action==='mood-skip'){
+    data.moodLog[ui.moodPromptDay] = {feeling:null, mood:null, sleepHours:null, skipped:true, ts:new Date().toISOString()};
+    saveData(); ui.moodPromptDay = null; render();
+  } else if (action==='export-data'){
+    exportData();
+  } else if (action==='trigger-import'){
+    document.getElementById('import-file').click();
+  }
+});
+
+document.getElementById('app').addEventListener('change', function(e){
+  var el = e.target.closest('[data-field]');
+  if (!el) return;
+  var field = el.dataset.field;
+  if (field==='startDate'){ if (!el.value) return; data.startDate = el.value; }
+  else if (field==='stockZ'){ data.stockZ = Math.max(0, Number(el.value)||0); }
+  else if (field==='stockA'){ data.stockA = Math.max(0, Number(el.value)||0); }
+  saveData(); render();
+});
+
+// sleep-hours field: track keystrokes without re-rendering, so typing doesn't lose focus/cursor
+document.getElementById('app').addEventListener('input', function(e){
+  var el = e.target.closest('[data-mood-field="sleepHours"]');
+  if (!el) return;
+  ui.moodDraftSleep = el.value;
+});
+
+document.getElementById('import-file').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try {
+      var parsed = JSON.parse(reader.result);
+      if (!parsed || typeof parsed !== 'object') throw new Error('bad shape');
+      if (!confirm('Заменить текущие данные данными из файла? Текущий прогресс в этом браузере будет перезаписан.')) return;
+      data = {
+        startDate: parsed.startDate || isoFromDate(new Date()),
+        taken: parsed.taken || {},
+        stockZ: typeof parsed.stockZ === 'number' ? parsed.stockZ : DEFAULT_STOCK_Z,
+        stockA: typeof parsed.stockA === 'number' ? parsed.stockA : DEFAULT_STOCK_A,
+        moodLog: parsed.moodLog || {}
+      };
+      saveData(); render();
+      alert('Данные восстановлены из файла.');
+    } catch(err){
+      alert('Не удалось прочитать файл — похоже, это не тот формат.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+render();
+</script>
+</body>
+</html>
