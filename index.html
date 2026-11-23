@@ -1,217 +1,734 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" id="meta-theme-color" content="#f5f6f8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Курс лечения">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23b45309'/%3E%3Cg transform='rotate(-40 90 90)' fill='none' stroke='%23ffffff' stroke-width='12' stroke-linecap='round'%3E%3Crect x='38' y='68' width='104' height='44' rx='22'/%3E%3Cline x1='90' y1='68' x2='90' y2='112'/%3E%3C/g%3E%3C/svg%3E">
 <title>Курс лечения — трекер</title>
 <style>
   :root{
-    --bg:#f3f4f6; --card:#ffffff; --ink:#111827; --muted:#6b7280; --muted2:#9ca3af;
-    --border:#e5e7eb; --border2:#f3f4f6; --blue:#3b82f6; --pink:#ec4899; --orange:#f97316; --red:#ef4444;
-    --green:#22c55e; --gray100:#f3f4f6; --gray200:#e5e7eb; --gray300:#d1d5db;
+    color-scheme:light;
+    --bg:#f5f6f8; --card:#ffffff; --surface:#f9fafb; --surface-hover:#f3f4f6;
+    --ink:#111827; --muted:#4b5563; --muted2:#6b7280;
+    --border:#e5e7eb; --border2:#eef0f3;
+    --accent:#2563eb; --accent-hover:#1d4ed8; --accent-ink:#2563eb;
+    --accent-soft:#eff6ff; --accent-border:#bfdbfe; --on-accent:#ffffff;
+    --nav-bg:rgba(255,255,255,.82); --nav-border:rgba(17,24,39,.08);
+    --nav-pill:rgba(37,99,235,.10); --nav-shadow:0 8px 30px rgba(17,24,39,.10), 0 1px 3px rgba(17,24,39,.06);
+    --blue:#2563eb; --pink:#db2777; --violet:#7c3aed; --teal:#0d9488;
+    --cyan:#0891b2; --amber:#d97706; --indigo:#4f46e5;
+    --orange:#ea580c; --red:#dc2626; --green:#16a34a;
+    --done-bg:#f0fdf4; --done-bg-hover:#dcfce7; --done-border:#bbf7d0; --done-ink:#15803d;
+    --today-bg:#eff6ff;
+    --gray100:#f3f4f6; --gray200:#e5e7eb; --gray300:#d1d5db;
+    --grid-line:#e5e7eb; --chart-label:#6b7280;
+    --ease-out:cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out:cubic-bezier(0.77, 0, 0.175, 1);
+    --shadow-sm:0 1px 2px rgba(17,24,39,.04), 0 1px 3px rgba(17,24,39,.03);
+    --shadow-md:0 2px 6px rgba(17,24,39,.04), 0 8px 20px rgba(17,24,39,.04);
+  }
+  [data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#11161d; --card:#1a212b; --surface:#232c38; --surface-hover:#2b3544;
+    --ink:#f3f4f6; --muted:#a1aab8; --muted2:#8892a2;
+    --border:#2c3645; --border2:#232c38;
+    --accent:#d89065; --accent-hover:#e3a178; --accent-ink:#e09b70;
+    --accent-soft:rgba(216,144,101,.14); --accent-border:rgba(216,144,101,.34); --on-accent:#11161d;
+    --nav-bg:rgba(26,33,43,.84); --nav-border:rgba(255,255,255,.09);
+    --nav-pill:rgba(255,255,255,.09); --nav-shadow:0 12px 36px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.06);
+    --blue:#60a5fa; --pink:#f472b6; --violet:#a78bfa; --teal:#2dd4bf;
+    --cyan:#22d3ee; --amber:#d89065; --indigo:#818cf8;
+    --orange:#d89065; --red:#f87171; --green:#4ade80;
+    --done-bg:rgba(74,222,128,.10); --done-bg-hover:rgba(74,222,128,.16); --done-border:rgba(74,222,128,.28); --done-ink:#86efac;
+    --today-bg:rgba(216,144,101,.10);
+    --gray100:#232c38; --gray200:#2c3645; --gray300:#3b4758;
+    --grid-line:#2c3645; --chart-label:#8892a2;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.28), 0 1px 4px rgba(0,0,0,.2);
+    --shadow-md:0 4px 12px rgba(0,0,0,.35), 0 12px 28px rgba(0,0,0,.28);
   }
   *{box-sizing:border-box;}
+  ::selection{background:var(--accent-soft); color:var(--accent-ink);}
+  html{scrollbar-gutter:stable;}
   body{
     margin:0; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    caret-color:var(--accent);
   }
-  button{font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent;}
-  input{font:inherit;}
-  .page{min-height:100vh; padding:24px 16px 48px;}
-  .container{max-width:420px; margin:0 auto; display:flex; flex-direction:column; gap:20px;}
-  .card{background:var(--card); border-radius:16px; box-shadow:0 1px 2px rgba(0,0,0,.04),0 1px 6px rgba(0,0,0,.04);}
-  .card-lg{border-radius:24px;}
-  .section-label{font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; padding:0 4px; margin:0 0 6px;}
-  h1.title{font-size:28px; font-weight:700; letter-spacing:-0.02em; margin:0;}
-  .sub{font-size:14px; color:var(--muted); margin:4px 0 0;}
-  .storage-note{font-size:11px; color:var(--muted2); margin:6px 0 0; line-height:1.4;}
-  .toolbar{display:flex; align-items:flex-start; gap:2px; flex-shrink:0;}
-  .icon-btn{padding:6px; color:var(--muted2); background:none; border:none; border-radius:8px; display:flex; align-items:center;}
-  .icon-btn:hover{color:var(--muted);}
-  .row-between{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
-  .progress-row{display:flex; align-items:center; gap:12px; margin-top:12px;}
+  button{
+    font:inherit; color:inherit; cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  input, textarea{font:inherit; color:inherit;}
+  button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .num{font-variant-numeric:tabular-nums;}
+
+  .page{min-height:100vh; padding:20px 16px calc(108px + env(safe-area-inset-bottom));}
+  .container{max-width:440px; margin:0 auto; display:flex; flex-direction:column; gap:18px;}
+
+  .tab-panel{display:flex; flex-direction:column; gap:18px;}
+  .tab-panel.animate-in{animation:tabEnter .2s var(--ease-out);}
+  @keyframes tabEnter{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .card{
+    background:var(--card); border-radius:18px;
+    border:1px solid var(--border2);
+    box-shadow:var(--shadow-sm);
+  }
+  .card-lg{border-radius:22px; box-shadow:var(--shadow-md);}
+
+  .section-label{
+    font-size:11.5px; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.05em;
+    padding:0 4px; margin:2px 0 8px;
+  }
+
+  /* header */
+  h1.title{font-size:26px; font-weight:750; letter-spacing:-0.025em; margin:0; text-wrap:balance; line-height:1.15;}
+  .sub{font-size:13.5px; color:var(--muted); margin:4px 0 0; line-height:1.4;}
+  .row-between{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+  .icon-btn{
+    width:36px; height:36px; color:var(--muted); background:var(--card);
+    border:1px solid var(--border); border-radius:12px;
+    display:inline-flex; align-items:center; justify-content:center;
+    transition:background .15s var(--ease-out), color .15s var(--ease-out), transform .12s var(--ease-out);
+  }
+  .icon-btn:hover{background:var(--surface-hover); color:var(--ink);}
+  .icon-btn:active{transform:scale(.94);}
+
+  .progress-row{display:flex; align-items:center; gap:10px; margin-top:12px;}
   .progress-track{flex:1; height:6px; border-radius:99px; background:var(--gray200); overflow:hidden;}
-  .progress-fill{height:100%; background:var(--blue); border-radius:99px; transition:width .3s;}
-  .progress-pct{font-size:12px; font-weight:600; color:var(--muted); flex-shrink:0;}
-  .field-row{display:flex; align-items:center; gap:6px; font-size:14px; color:var(--muted); margin-top:10px; flex-wrap:wrap;}
-  .field-row input[type=date], .field-row input[type=number]{
-    border:1px solid var(--gray300); border-radius:8px; padding:4px 8px; font-size:16px; color:var(--ink); background:#fff;
-  }
-  .sleep-row{display:flex; align-items:center; gap:8px;}
-  .sleep-input{width:110px; border:1px solid var(--gray300); border-radius:10px; padding:10px 12px; font-size:16px; color:var(--ink);}
-  .sleep-unit{font-size:14px; color:var(--muted);}
-  .field-row input[type=number]{width:60px;}
-  .stock-group{display:flex; align-items:center; gap:6px;}
-  .stock-label{font-weight:600; color:var(--ink);}
-  .ml-auto{margin-left:auto;}
-  .reminder{padding:14px; display:flex; align-items:center; gap:12px;}
-  .reminder-icon{width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;}
-  .bg-orange{background:var(--orange);}
-  .bg-red{background:var(--red);}
-  .reminder-title{font-size:14px; font-weight:600; color:var(--ink);}
-  .reminder-sub{font-size:12px; color:var(--muted); margin-top:2px;}
-  .reminder-sub.urgent{color:var(--red); font-weight:600;}
+  .progress-fill{width:100%; height:100%; background:var(--accent); border-radius:99px; transform-origin:left center; transition:transform .28s var(--ease-out);}
+  .progress-pct{font-size:12.5px; font-weight:700; color:var(--muted); flex-shrink:0;}
+
+  /* today timeline */
   .today-card{padding:16px;}
-  .today-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px;}
-  .today-head h2{font-size:15px; font-weight:600; margin:0;}
-  .today-date{font-size:12px; color:var(--muted2);}
-  .dose-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
-  .slot-label{font-size:11px; font-weight:600; color:var(--muted2); text-transform:uppercase; letter-spacing:.04em; text-align:center;}
-  .span2{grid-column:span 2;}
-  .capsule-wrap{display:flex; justify-content:center;}
-  .capsule{border-radius:99px; display:flex; align-items:center; justify-content:center; background:#fff; border:2px solid var(--gray300); color:var(--muted2); flex-shrink:0;}
-  .capsule-lg{width:56px; height:56px;}
-  .capsule-sm{width:32px; height:32px; border-width:1px;}
-  .capsule-z{border-color:#bfdbfe; color:#60a5fa;}
-  .capsule-a{border-color:#fbcfe8; color:#f472b6;}
-  .capsule-z.capsule-on{background:var(--blue); border-color:var(--blue); color:#fff;}
-  .capsule-a.capsule-on{background:var(--pink); border-color:var(--pink); color:#fff;}
-  .capsule-num{font-size:13px; font-weight:600;}
-  .capsule-sm .capsule-num{font-size:11px;}
-  .check-icon{width:22px; height:22px;}
-  .capsule-sm .check-icon{width:14px; height:14px;}
-  .cap-tag{text-align:center; font-size:11px; color:var(--muted); margin-top:0;}
-  .today-note{font-size:11px; color:var(--muted2); margin:10px 0 0;}
+  .today-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;}
+  .today-head h2{font-size:16.5px; font-weight:700; margin:0; letter-spacing:-0.01em; text-wrap:balance;}
+  .day-nav{display:flex; align-items:center; gap:4px; flex-shrink:0;}
+  .day-nav-btn{
+    width:28px; height:28px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface); color:var(--muted); display:inline-flex; align-items:center; justify-content:center;
+    transition:background .15s var(--ease-out), color .15s var(--ease-out), transform .1s var(--ease-out);
+  }
+  .day-nav-btn:hover:not(:disabled){background:var(--surface-hover); color:var(--ink);}
+  .day-nav-btn:active:not(:disabled){transform:scale(.92);}
+  .day-nav-btn:disabled{opacity:.35; cursor:not-allowed;}
+  .today-pill{
+    font-size:11px; font-weight:600; color:var(--accent-ink); background:var(--accent-soft);
+    border:1px solid var(--accent-border); border-radius:99px; padding:3px 9px;
+    transition:opacity .15s var(--ease-out);
+  }
+  .today-pill:hover{opacity:.85;}
+
+  .today-meta-row{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    font-size:12.5px; color:var(--muted); margin-bottom:14px; padding-bottom:10px;
+    border-bottom:1px solid var(--border2);
+  }
+  .today-meta-row b{color:var(--ink);}
+
+  .timeline{display:flex; flex-direction:column; gap:14px; position:relative;}
+  .tl-slot{position:relative; padding-left:20px;}
+  .tl-slot::before{
+    content:''; position:absolute; left:5px; top:18px; bottom:-10px; width:2px; background:var(--gray200);
+  }
+  .tl-slot:last-child::before{display:none;}
+  .tl-dot{
+    position:absolute; left:0; top:5px; width:12px; height:12px; border-radius:99px;
+    background:var(--card); border:2.5px solid var(--gray300); z-index:1;
+    transition:background .2s var(--ease-out), border-color .2s var(--ease-out), transform .2s var(--ease-out);
+  }
+  .tl-dot.done{background:var(--green); border-color:var(--green);}
+  .tl-dot.partial{border-color:var(--accent); background:var(--accent-soft);}
+  .tl-dot.now{border-color:var(--accent); background:var(--accent); transform:scale(1.12);}
+
+  .tl-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;}
+  .tl-title-group{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .tl-title{font-size:13.5px; font-weight:700; color:var(--ink);}
+  .tl-time{font-size:12px; color:var(--muted2); font-weight:500;}
+  .now-badge{
+    font-size:10.5px; font-weight:700; color:var(--accent-ink); background:var(--accent-soft);
+    border:1px solid var(--accent-border); padding:1px 7px; border-radius:99px;
+  }
+  .slot-all-btn{
+    font-size:11px; font-weight:600; color:var(--muted); background:var(--gray100);
+    border:none; border-radius:99px; padding:3px 9px; flex-shrink:0;
+    transition:background .15s var(--ease-out), color .15s var(--ease-out);
+  }
+  .slot-all-btn:hover{background:var(--gray200); color:var(--ink);}
+
+  .slot-collapsed-btn{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:9px 12px; border-radius:12px;
+    background:var(--done-bg); border:1px solid var(--done-border); color:var(--done-ink);
+    font-size:13px; font-weight:600; text-align:left;
+    transition:background .15s var(--ease-out);
+  }
+  .slot-collapsed-btn:hover{background:var(--done-bg-hover);}
+
+  .tl-items{display:flex; flex-direction:column; gap:6px;}
+  .tl-slot.is-now .tl-items{
+    padding:6px; margin:-6px; border-radius:16px;
+    background:var(--today-bg); border:1px solid var(--accent-border);
+  }
+
+  .dose-row{
+    width:100%; display:flex; align-items:center; gap:10px; padding:9px 11px;
+    background:var(--surface); border:1px solid var(--border2); border-radius:12px;
+    text-align:left;
+    transition:background .18s var(--ease-out), border-color .18s var(--ease-out), transform .12s var(--ease-out);
+  }
+  .dose-row:hover{background:var(--surface-hover); border-color:var(--border);}
+  .dose-row:active{transform:scale(.985);}
+  .dose-row.is-taken{background:var(--done-bg); border-color:var(--done-border);}
+  .dose-row.is-taken:hover{background:var(--done-bg-hover);}
+
+  .dose-badge{
+    width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; font-weight:700; flex-shrink:0; border:1px solid var(--border);
+    background:var(--card);
+    transition:opacity .18s var(--ease-out);
+  }
+  .dose-row.is-taken .dose-badge{opacity:.78;}
+  .dose-info{flex:1; min-width:0;}
+  .dose-name{font-size:13.5px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px; flex-wrap:wrap; line-height:1.3;}
+  .dose-row.is-taken .dose-name{color:var(--muted);}
+  .dose-meta{font-size:12px; color:var(--muted2); margin-top:2px; line-height:1.3;}
+  .dose-days{
+    font-size:10.5px; font-weight:600; color:var(--muted); background:var(--card);
+    border:1px solid var(--border); padding:1px 6px; border-radius:99px;
+  }
+  .dose-check{
+    width:24px; height:24px; border-radius:99px; border:2px solid var(--gray300); background:var(--card);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#fff;
+    transition:background .18s var(--ease-out), border-color .18s var(--ease-out), transform .22s var(--ease-out);
+  }
+  .dose-row.is-taken .dose-check{background:var(--green); border-color:var(--green); color:#fff; transform:scale(1.06);}
+  [data-theme="dark"] .dose-row.is-taken .dose-check{color:#11161d;}
+  .check-icon{width:14px; height:14px;}
+
+  .checkin-bar{
+    width:100%; margin-top:14px; padding:10px 12px; border-radius:12px;
+    background:var(--surface); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    text-align:left; transition:background .15s var(--ease-out);
+  }
+  .checkin-bar:hover{background:var(--surface-hover);}
+  .checkin-main{font-size:12.5px; font-weight:600; color:var(--ink); line-height:1.35;}
+  .checkin-sub{font-size:11.5px; color:var(--muted2); margin-top:2px; line-height:1.35;}
+  .checkin-cta{font-size:12px; font-weight:600; color:var(--accent-ink); flex-shrink:0;}
+  .today-note{font-size:11.5px; color:var(--muted2); margin:12px 0 0; line-height:1.45;}
+
+  /* reminders */
+  .reminder{padding:12px 14px; display:flex; align-items:center; gap:12px;}
+  .reminder-icon{width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;}
+  .bg-orange{background:var(--accent);}
+  .bg-red{background:var(--red);}
+  .bg-teal{background:var(--teal);}
+  .bg-blue{background:var(--accent);}
+  [data-theme="dark"] .reminder-icon{color:#11161d;}
+  .reminder-body{flex:1; min-width:0;}
+  .reminder-title{font-size:13.5px; font-weight:600; color:var(--ink); line-height:1.35;}
+  .reminder-sub{font-size:12px; color:var(--muted); margin-top:2px; line-height:1.35;}
+  .reminder-sub.urgent{color:var(--red); font-weight:600;}
+  .refill-btn{
+    padding:6px 10px; border-radius:9px; border:1px solid var(--border);
+    background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;
+    flex-shrink:0; transition:background .15s var(--ease-out), transform .1s var(--ease-out);
+  }
+  .refill-btn:hover{background:var(--surface-hover);}
+  .refill-btn:active{transform:scale(.94);}
+
+  /* stats */
   .stats-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
-  .stat-card{padding:12px; border-radius:16px;}
-  .stat-value{font-size:22px; font-weight:700; color:var(--ink);}
-  .stat-label{font-size:12px; color:var(--muted); margin-top:2px;}
-  .stat-sub{font-size:11px; color:var(--muted2); margin-top:2px;}
-  .stat-warn{font-size:11px; color:var(--red); font-weight:600; margin-top:4px;}
+  .stat-card{padding:13px; border-radius:16px;}
+  .stat-value{font-size:20px; font-weight:750; color:var(--ink); letter-spacing:-0.02em;}
+  .stat-label{font-size:12px; font-weight:500; color:var(--muted); margin-top:3px; display:flex; align-items:center; gap:6px;}
+  .stat-sub{font-size:11.5px; color:var(--muted2); margin-top:2px;}
+  .stat-warn{font-size:11.5px; color:var(--red); font-weight:600; margin-top:4px;}
+
+  /* calendar accordion */
   .grouped{border-radius:16px; overflow:hidden;}
   .grouped > * + *{border-top:1px solid var(--border2);}
-  .week-head{width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:none; border:none; text-align:left;}
+  .week-head{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px; background:none; border:none; text-align:left;
+    transition:background .15s var(--ease-out);
+  }
+  .week-head:hover{background:var(--surface);}
   .week-title{font-size:14px; font-weight:600; color:var(--ink);}
   .week-range{font-weight:400; color:var(--muted2);}
-  .week-count{font-size:12px; color:var(--muted2);}
-  .week-body{background:#f9fafb;}
+  .week-count{font-size:12px; font-weight:600; color:var(--muted);}
+  .week-body{background:var(--surface);}
   .week-body > * + *{border-top:1px solid var(--border2);}
-  .day-row{display:flex; align-items:center; justify-content:space-between; padding:10px 14px;}
-  .day-info{font-size:11px;}
-  .day-num{font-weight:600; color:var(--ink);}
-  .day-date{color:var(--muted2);}
-  .day-badge{margin-top:2px;}
-  .day-badge.orange{color:var(--orange);}
-  .day-badge.red{color:var(--red);}
-  .caps-row{display:flex; gap:6px;}
+
+  .day-row{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 14px; background:transparent; border:none; text-align:left;
+    transition:background .15s var(--ease-out);
+  }
+  .day-row:hover{background:var(--surface-hover);}
+  .day-row.is-today{background:var(--today-bg);}
+  .day-row.is-selected{box-shadow:inset 3px 0 0 var(--accent);}
+  .day-info{font-size:11.5px; flex-shrink:0;}
+  .day-num{font-weight:700; color:var(--ink);}
+  .day-date{color:var(--muted2); margin-top:1px;}
+  .day-badge{margin-top:3px; font-size:10.5px; font-weight:600;}
+  .day-badge.orange{color:var(--accent-ink);}
+  .day-right{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  .day-dots{display:flex; align-items:center; gap:4px;}
+  .med-pip{
+    width:20px; height:20px; border-radius:99px; font-size:9.5px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+    border:1.5px solid;
+  }
+  .day-ratio{
+    font-size:11.5px; font-weight:700; padding:3px 8px; border-radius:99px;
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    min-width:46px; text-align:center;
+  }
+  .day-ratio.done{background:var(--done-bg); border-color:var(--done-border); color:var(--done-ink);}
+
+  /* journal & charts */
   .journal-list{padding:0 14px;}
-  .journal-row{display:flex; align-items:center; justify-content:space-between; font-size:12px; padding:10px 0;}
+  .journal-row{display:flex; align-items:center; justify-content:space-between; font-size:12.5px; padding:10px 0; gap:8px;}
   .journal-row + .journal-row{border-top:1px solid var(--border2);}
-  .journal-time{color:var(--muted2); flex-shrink:0; margin-left:8px;}
-  .empty-note{font-size:14px; color:var(--muted2); padding:4px 0;}
-  .chart-toggle{width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:none; border:none; text-align:left;}
-  .chart-avg{display:flex; gap:16px; font-size:12px; color:var(--muted); margin-bottom:10px;}
+  .journal-time{color:var(--muted2); flex-shrink:0;}
+  .note-entry{padding:11px 0;}
+  .note-entry + .note-entry{border-top:1px solid var(--border2);}
+  .note-entry-head{display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:600; color:var(--ink);}
+  .note-entry-scores{color:var(--accent-ink);}
+  .note-entry-text{font-size:13px; color:var(--muted); margin-top:3px; line-height:1.4;}
+  .empty-note{font-size:13.5px; color:var(--muted); padding:4px 0; margin:0; line-height:1.45;}
+  .chart-avg{display:flex; gap:16px; font-size:12.5px; color:var(--muted); margin-bottom:10px;}
   .chart-avg b{color:var(--ink); font-weight:600;}
-  .legend{display:flex; gap:14px; font-size:11px; color:var(--muted); margin-bottom:4px;}
-  .legend span{display:inline-flex; align-items:center; gap:4px;}
-  .dot{width:8px; height:8px; border-radius:99px; display:inline-block; vertical-align:middle;}
-  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; padding:16px; z-index:50;}
-  .modal{width:100%; max-width:360px; background:#fff; border-radius:24px; padding:20px; display:flex; flex-direction:column; gap:16px;}
-  .modal h3{margin:0; font-size:17px; font-weight:700;}
-  .modal .sub{margin-top:2px;}
-  .scale-label{font-size:14px; font-weight:600; color:var(--ink); margin:0 0 8px;}
-  .scale-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:8px;}
-  .scale-btn{height:40px; border-radius:10px; border:none; background:var(--gray100); color:#374151; font-weight:600; font-size:14px;}
-  .scale-btn.selected{background:var(--blue); color:#fff;}
+  .legend{display:flex; gap:14px; font-size:11.5px; color:var(--muted); margin-bottom:4px;}
+  .legend span{display:inline-flex; align-items:center; gap:5px;}
+  .dot{width:8px; height:8px; border-radius:99px; display:inline-block; vertical-align:middle; flex-shrink:0;}
+
+  /* settings tab ("Ещё") */
+  .settings-card{padding:14px;}
+  .field-row{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--muted); flex-wrap:wrap;}
+  .field-row + .field-row{margin-top:12px; padding-top:12px; border-top:1px solid var(--border2);}
+  .field-row label{font-weight:500; color:var(--ink);}
+  .field-row input[type=date], .field-row input[type=number]{
+    border:1px solid var(--gray300); border-radius:9px; padding:6px 10px;
+    font-size:14px; color:var(--ink); background:var(--surface);
+    transition:border-color .15s var(--ease-out);
+  }
+  .field-row input[type=number]{width:66px; text-align:center;}
+  .stock-group{display:flex; align-items:center; gap:5px;}
+  .stock-label{font-weight:700; font-size:13px; width:14px; text-align:center;}
+  .ml-auto{margin-left:auto;}
+  .seg-control{
+    display:inline-flex; padding:3px; border-radius:10px;
+    background:var(--surface); border:1px solid var(--border);
+  }
+  .seg-btn{
+    padding:5px 11px; border-radius:7px; border:none; background:transparent;
+    font-size:12.5px; font-weight:600; color:var(--muted);
+    transition:background .15s var(--ease-out), color .15s var(--ease-out);
+  }
+  .seg-btn.is-active{background:var(--accent); color:var(--on-accent);}
+
+  .action-btn{
+    width:100%; padding:11px 14px; border-radius:12px;
+    border:1px solid var(--border); background:var(--surface); color:var(--ink);
+    font-size:13.5px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:background .15s var(--ease-out), transform .1s var(--ease-out);
+  }
+  .action-btn:hover{background:var(--surface-hover);}
+  .action-btn:active{transform:scale(.985);}
+  .action-btn.primary{
+    border-color:var(--accent-border); background:var(--accent-soft); color:var(--accent-ink);
+  }
+  .action-btn.danger{
+    border-color:rgba(248,113,113,.3); color:var(--red);
+  }
+  .storage-note{font-size:12px; color:var(--muted2); margin:0; line-height:1.45; padding:0 4px;}
+
+  /* floating glassmorphic bottom nav (matching coffee calculator) */
+  .bottom-nav-wrap{
+    position:fixed; left:0; right:0;
+    bottom:max(14px, env(safe-area-inset-bottom));
+    padding:0 16px; z-index:40; pointer-events:none;
+  }
+  .bottom-nav{
+    pointer-events:auto;
+    max-width:408px; margin:0 auto;
+    padding:5px; border-radius:99px;
+    background:var(--nav-bg);
+    border:1px solid var(--nav-border);
+    box-shadow:var(--nav-shadow);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    display:grid; grid-template-columns:repeat(4,1fr);
+    position:relative;
+  }
+  .nav-indicator{
+    position:absolute; top:5px; bottom:5px; left:5px;
+    width:calc((100% - 10px) / 4);
+    border-radius:99px;
+    background:var(--nav-pill);
+    border:1px solid var(--accent-border);
+    transition:transform .22s var(--ease-in-out);
+    pointer-events:none;
+  }
+  .nav-item{
+    position:relative; z-index:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    padding:7px 4px; border:none; background:transparent; border-radius:99px;
+    color:var(--muted); font-size:11px; font-weight:600;
+    transition:color .18s ease, transform .12s var(--ease-out);
+  }
+  .nav-item:active{transform:scale(.94);}
+  .nav-item svg{transition:transform .2s var(--ease-out);}
+  .nav-item.is-active{color:var(--accent-ink);}
+  .nav-item.is-active svg{transform:translateY(-1px) scale(1.06);}
+
+  /* modals */
+  .overlay{
+    position:fixed; inset:0; background:rgba(17,22,29,.62);
+    backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center; padding:16px; z-index:60;
+    animation:fadeIn .18s var(--ease-out);
+  }
+  @keyframes fadeIn{from{opacity:0;}}
+  .modal{
+    width:100%; max-width:360px; background:var(--card); border:1px solid var(--border);
+    border-radius:24px; padding:20px;
+    display:flex; flex-direction:column; gap:14px;
+    box-shadow:0 16px 40px rgba(0,0,0,.35);
+    animation:modalPop .22s var(--ease-out);
+  }
+  @keyframes modalPop{
+    from{opacity:0; transform:scale(.95) translateY(6px);}
+    to{opacity:1; transform:scale(1) translateY(0);}
+  }
+  .modal h3{margin:0; font-size:17px; font-weight:700; text-wrap:balance;}
+  .modal .sub{margin-top:3px;}
+  .scale-label{font-size:13.5px; font-weight:600; color:var(--ink); margin:0 0 7px;}
+  .scale-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:7px;}
+  .scale-btn{
+    height:38px; border-radius:10px; border:1px solid var(--border2);
+    background:var(--surface); color:var(--ink); font-weight:600; font-size:14px;
+    transition:background .15s var(--ease-out), color .15s var(--ease-out), transform .1s var(--ease-out);
+  }
+  .scale-btn:hover{background:var(--surface-hover);}
+  .scale-btn:active{transform:scale(.94);}
+  .scale-btn.selected{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
+  .sleep-row{display:flex; align-items:center; gap:8px;}
+  .sleep-input{width:110px; border:1px solid var(--gray300); border-radius:10px; padding:9px 11px; font-size:15px; color:var(--ink); background:var(--surface);}
+  .sleep-unit{font-size:13px; color:var(--muted);}
+  .note-input{
+    width:100%; border:1px solid var(--gray300); border-radius:10px; padding:9px 11px;
+    font-size:14px; color:var(--ink); background:var(--surface); resize:vertical; min-height:58px;
+  }
   .modal-actions{display:flex; gap:8px; padding-top:2px;}
-  .btn-flat{flex:1; padding:10px; border-radius:12px; border:none; font-size:14px; font-weight:600;}
-  .btn-secondary{background:var(--gray100); color:#374151;}
-  .btn-primary{background:var(--blue); color:#fff;}
-  .btn-primary[disabled]{background:var(--gray300); color:#fff;}
+  .btn-flat{flex:1; padding:10px 12px; border-radius:12px; border:none; font-size:14px; font-weight:600; transition:opacity .15s var(--ease-out), background .15s var(--ease-out);}
+  .btn-secondary{background:var(--gray100); color:var(--ink);}
+  .btn-secondary:hover{background:var(--gray200);}
+  .btn-primary{background:var(--accent); color:var(--on-accent);}
+  .btn-primary:hover:not(:disabled){opacity:.92;}
+  .btn-primary:disabled{background:var(--gray300); color:var(--muted); cursor:not-allowed;}
   .btn-danger{background:var(--red); color:#fff;}
-  .reset-row{width:100%; display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border:none; background:transparent; color:var(--red); font-size:13px; font-weight:600;}
+  [data-theme="dark"] .btn-danger{color:#11161d;}
+  .btn-danger:hover{opacity:.92;}
+
+  @media (hover: hover) and (pointer: fine){
+    .icon-btn:hover{background:var(--surface-hover); color:var(--ink);}
+    .day-nav-btn:hover:not(:disabled){background:var(--surface-hover); color:var(--ink);}
+    .today-pill:hover{opacity:.85;}
+    .slot-all-btn:hover{background:var(--gray200); color:var(--ink);}
+    .slot-collapsed-btn:hover{background:var(--done-bg-hover);}
+    .dose-row:hover{background:var(--surface-hover); border-color:var(--border);}
+    .dose-row.is-taken:hover{background:var(--done-bg-hover);}
+    .checkin-bar:hover{background:var(--surface-hover);}
+    .refill-btn:hover{background:var(--surface-hover);}
+    .week-head:hover{background:var(--surface);}
+    .day-row:hover{background:var(--surface-hover);}
+    .action-btn:hover{background:var(--surface-hover);}
+    .scale-btn:hover{background:var(--surface-hover);}
+    .btn-secondary:hover{background:var(--gray200);}
+    .btn-primary:hover:not(:disabled){opacity:.92;}
+    .btn-danger:hover{opacity:.92;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .tab-panel.animate-in, .modal{animation-name:fadeIn; animation-duration:.15s;}
+    .nav-indicator, .progress-fill, .dose-check, .tl-dot, .nav-item svg{transition-property:opacity, background-color, border-color, color; transition-duration:.12s;}
+  }
 </style>
 </head>
 <body>
   <div id="app"></div>
+  <nav class="bottom-nav-wrap" id="bottom-nav" aria-label="Навигация">
+    <div class="bottom-nav" role="tablist">
+      <div class="nav-indicator" id="nav-indicator"></div>
+      <button type="button" role="tab" aria-selected="true" class="nav-item is-active" data-action="switch-tab" data-tab="today">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span>Сегодня</span>
+      </button>
+      <button type="button" role="tab" aria-selected="false" class="nav-item" data-action="switch-tab" data-tab="courses">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span>Курсы</span>
+      </button>
+      <button type="button" role="tab" aria-selected="false" class="nav-item" data-action="switch-tab" data-tab="journal">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+        <span>Журнал</span>
+      </button>
+      <button type="button" role="tab" aria-selected="false" class="nav-item" data-action="switch-tab" data-tab="more">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2" fill="var(--card)"/><circle cx="15" cy="12" r="2" fill="var(--card)"/><circle cx="10" cy="17" r="2" fill="var(--card)"/></svg>
+        <span>Ещё</span>
+      </button>
+    </div>
+  </nav>
   <input type="file" id="import-file" accept="application/json" style="display:none">
 <script>
 "use strict";
 
-/* ---------------- constants ---------------- */
-var STORAGE_KEY = 'med-course-v1';
-var COURSE_LENGTH = 35;
-var DOCTOR_VISIT_ISO = '2026-09-27';
-var DOCTOR_VISIT_TIME = '10:00';
-var DEFAULT_STOCK_Z = 56;
-var DEFAULT_STOCK_A = 50;
+/* ---------------- constants & course definitions ---------------- */
+var STORAGE_KEY = 'med-course-v2';
+var DEFAULT_START_ISO = '2026-11-23';
+var COURSE_END_ISO = '2027-02-28';
 
-/* ---------------- icons (inline SVG, no dependencies) ---------------- */
+var DEFAULT_STOCK_Z = 30;
+var DEFAULT_STOCK_P = 60;
+var DEFAULT_STOCK_T = 25;
+
+var PACK_SIZE = { 'З': 30, 'П': 60, 'Т': 25 };
+
+var TABS = [
+  { key:'today', label:'Сегодня' },
+  { key:'courses', label:'Курсы' },
+  { key:'journal', label:'Журнал' },
+  { key:'more', label:'Ещё' }
+];
+
+var SLOTS = [
+  { key:'Утро', title:'Утро', hint:'после еды' },
+  { key:'День', title:'День', hint:'до 16:00' },
+  { key:'Вечер', title:'Вечер', hint:'до 22:00' },
+  { key:'На ночь', title:'На ночь', hint:'перед сном' }
+];
+
+var MED_META = {
+  'З':        { name:'З', short:'З', color:'var(--blue)' },
+  'П':        { name:'П', short:'П', color:'var(--pink)' },
+  'Т':        { name:'Т', short:'Т', color:'var(--violet)' },
+  'Вода':     { name:'Промывание носа', short:'М', color:'var(--cyan)' },
+  'Нозефрин': { name:'Нозефрин', short:'Н', color:'var(--teal)' },
+  'Синупрет': { name:'Синупрет', short:'С', color:'var(--amber)' },
+  'Зодак':    { name:'Зодак', short:'Зд', color:'var(--indigo)' }
+};
+
+/* ---------------- icons (inline SVG, consistent 2px stroke) ---------------- */
 var ICON = {
-  chevronDown: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>',
-  chevronUp: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>',
-  calendar: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  chevronDown: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  chevronUp: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>',
+  chevronLeft: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  chevronRight: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>',
+  sliders: '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2" fill="var(--card)"/><circle cx="15" cy="12" r="2" fill="var(--card)"/><circle cx="10" cy="17" r="2" fill="var(--card)"/></svg>',
+  navToday: '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  navCourses: '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  navJournal: '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
   stetho: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a4 4 0 008 0V3"/><path d="M6 3H4M14 3h2"/><path d="M10 13v2a5 5 0 0010 0v-1.5"/><circle cx="20" cy="13.2" r="1.6"/></svg>',
   pill: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="9" width="15" height="6" rx="3" transform="rotate(-40 12 12)"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-  reset: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.7 9.7 0 00-6.7 2.7L3 8"/><path d="M3 3v5h5"/></svg>',
+  drop: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7l5.7 6.8a7 7 0 11-11.4 0L12 2.7z"/></svg>',
+  reset: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.7 9.7 0 00-6.7 2.7L3 8"/><path d="M3 3v5h5"/></svg>',
   download: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 21h16"/></svg>',
   upload: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9m0 0l-4 4m4-4l4 4"/><path d="M4 3h16"/></svg>',
   check: '<svg viewBox="0 0 24 24" class="check-icon" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>'
 };
 
-/* ---------------- date helpers (local-time safe) ---------------- */
+/* ---------------- date & format helpers ---------------- */
 function dateFromISO(iso){ var p=iso.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); }
 function isoFromDate(d){ var y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+dd; }
 function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+function diffDays(a,b){ return Math.round((a - b)/86400000); }
 function shortDate(d){ return d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})+', '+d.toLocaleDateString('ru-RU',{weekday:'short'}); }
 function longDate(d){ return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}); }
-function formatNum(n){ var s=n.toFixed(1); return s.endsWith('.0')? s.slice(0,-2): s; }
+function formatNum(n){ if (n===0.5) return '½'; var s=n.toFixed(1); return s.endsWith('.0')? s.slice(0,-2): s; }
 function average(a){ if(!a.length) return 0; return a.reduce(function(x,y){return x+y;},0)/a.length; }
 function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
-/* ---------------- schedule / stats / reminders (same logic as before) ---------------- */
-function generateSchedule(startISO){
+function getActiveSlotKey(){
+  var now = new Date();
+  var mins = now.getHours() * 60 + now.getMinutes();
+  if (mins < 12 * 60) return 'Утро';
+  if (mins <= 16 * 60 + 30) return 'День';
+  if (mins < 22 * 60) return 'Вечер';
+  return 'На ночь';
+}
+
+/* ---------------- schedule generator ---------------- */
+function getCourseLength(startISO){
   var start = dateFromISO(startISO);
+  var end = dateFromISO(COURSE_END_ISO);
+  var len = diffDays(end, start) + 1;
+  return Math.max(60, len);
+}
+
+function generateSchedule(startISO, noseStartISO){
+  var start = dateFromISO(startISO);
+  var noseStart = dateFromISO(noseStartISO || startISO);
+  var totalDays = getCourseLength(startISO);
   var days = [];
-  for (var i=0;i<COURSE_LENGTH;i++){
-    var date = addDays(start,i);
-    var dayNumber = i+1;
+
+  for (var i=0; i<totalDays; i++){
+    var date = addDays(start, i);
+    var dayNumber = i + 1;
     var iso = isoFromDate(date);
-    var zAmount = dayNumber<=5 ? 0.5 : 1;
-    var doses = [
-      {id:'d'+dayNumber+'-z-morning', pill:'З', slot:'Утро', amount:zAmount},
-      {id:'d'+dayNumber+'-a-morning', pill:'А', slot:'Утро', amount:0.5},
-      {id:'d'+dayNumber+'-a-afternoon', pill:'А', slot:'День', amount:0.5},
-      {id:'d'+dayNumber+'-a-evening', pill:'А', slot:'Вечер', amount:1}
-    ];
-    days.push({dayNumber:dayNumber, iso:iso, date:date, doses:doses, isDoctorVisit: iso===DOCTOR_VISIT_ISO});
+    var noseDay = diffDays(date, noseStart) + 1;
+    var doses = [];
+
+    // УТРО (после еды)
+    doses.push({
+      id:'d'+dayNumber+'-z-morning', pill:'З', slot:'Утро', amount:1,
+      doseText:'1 таб', note:'после еды', courseTotal:totalDays, courseDay:dayNumber
+    });
+    if (dayNumber <= 60){
+      doses.push({
+        id:'d'+dayNumber+'-p-morning', pill:'П', slot:'Утро', amount:1,
+        doseText:'250 мг', note:'утром', courseTotal:60, courseDay:dayNumber
+      });
+    }
+    if (noseDay >= 1 && noseDay <= 10){
+      doses.push({
+        id:'n'+noseDay+'-water-morning', pill:'Вода', slot:'Утро', amount:1,
+        doseText:'морская вода', note:'1/3 за день · до Нозефрина', courseTotal:10, courseDay:noseDay
+      });
+      doses.push({
+        id:'n'+noseDay+'-nosefrin-morning', pill:'Нозефрин', slot:'Утро', amount:2,
+        doseText:'2 дозы', note:'после промывания', courseTotal:10, courseDay:noseDay
+      });
+    }
+    if (noseDay >= 1 && noseDay <= 7){
+      doses.push({
+        id:'n'+noseDay+'-sinupret-morning', pill:'Синупрет', slot:'Утро', amount:1,
+        doseText:'1 таб', note:'1/3 за день', courseTotal:7, courseDay:noseDay
+      });
+    }
+
+    // ДЕНЬ (до 16:00)
+    if (dayNumber <= 60){
+      doses.push({
+        id:'d'+dayNumber+'-p-day', pill:'П', slot:'День', amount:1,
+        doseText:'250 мг', note:'до 16:00', courseTotal:60, courseDay:dayNumber
+      });
+    }
+    if (noseDay >= 1 && noseDay <= 10){
+      doses.push({
+        id:'n'+noseDay+'-water-day', pill:'Вода', slot:'День', amount:1,
+        doseText:'морская вода', note:'2/3 за день', courseTotal:10, courseDay:noseDay
+      });
+    }
+    if (noseDay >= 1 && noseDay <= 7){
+      doses.push({
+        id:'n'+noseDay+'-sinupret-day', pill:'Синупрет', slot:'День', amount:1,
+        doseText:'1 таб', note:'2/3 за день', courseTotal:7, courseDay:noseDay
+      });
+    }
+
+    // ВЕЧЕР (до 22:00)
+    if (dayNumber <= 30){
+      doses.push({
+        id:'d'+dayNumber+'-t-evening', pill:'Т', slot:'Вечер', amount:0.5,
+        doseText:'½ таб', note:'до 22:00', courseTotal:30, courseDay:dayNumber
+      });
+    }
+    if (noseDay >= 1 && noseDay <= 10){
+      doses.push({
+        id:'n'+noseDay+'-water-evening', pill:'Вода', slot:'Вечер', amount:1,
+        doseText:'морская вода', note:'3/3 за день · до Нозефрина', courseTotal:10, courseDay:noseDay
+      });
+      doses.push({
+        id:'n'+noseDay+'-nosefrin-evening', pill:'Нозефрин', slot:'Вечер', amount:2,
+        doseText:'2 дозы', note:'после промывания', courseTotal:10, courseDay:noseDay
+      });
+    }
+    if (noseDay >= 1 && noseDay <= 7){
+      doses.push({
+        id:'n'+noseDay+'-sinupret-evening', pill:'Синупрет', slot:'Вечер', amount:1,
+        doseText:'1 таб', note:'3/3 за день', courseTotal:7, courseDay:noseDay
+      });
+    }
+
+    // НА НОЧЬ (перед сном)
+    if (noseDay >= 1 && noseDay <= 7){
+      doses.push({
+        id:'n'+noseDay+'-zodak-night', pill:'Зодак', slot:'На ночь', amount:1,
+        doseText:'1 таб', note:'на ночь', courseTotal:7, courseDay:noseDay
+      });
+    }
+
+    days.push({ dayNumber:dayNumber, noseDay:noseDay, iso:iso, date:date, doses:doses });
   }
   return days;
 }
+
 function computeStats(days, taken){
-  var totalZ=0, totalA=0, takenZ=0, takenA=0, totalDoses=0, takenDoses=0, daysWithAny=0, daysFull=0;
+  var totalZ=0, totalP=0, totalT=0, takenZ=0, takenP=0, takenT=0;
+  var totalDoses=0, takenDoses=0, daysWithAny=0, daysFull=0;
   days.forEach(function(day){
     var dayTaken=0;
     day.doses.forEach(function(dose){
       totalDoses++;
-      if (dose.pill==='З') totalZ+=dose.amount; else totalA+=dose.amount;
+      if (dose.pill==='З') totalZ += dose.amount;
+      else if (dose.pill==='П') totalP += dose.amount;
+      else if (dose.pill==='Т') totalT += dose.amount;
       if (taken[dose.id]){
         takenDoses++; dayTaken++;
-        if (dose.pill==='З') takenZ+=dose.amount; else takenA+=dose.amount;
+        if (dose.pill==='З') takenZ += dose.amount;
+        else if (dose.pill==='П') takenP += dose.amount;
+        else if (dose.pill==='Т') takenT += dose.amount;
       }
     });
     if (dayTaken>0) daysWithAny++;
     if (dayTaken===day.doses.length) daysFull++;
   });
-  return {totalZ:totalZ,totalA:totalA,takenZ:takenZ,takenA:takenA,totalDoses:totalDoses,takenDoses:takenDoses,daysWithAny:daysWithAny,daysFull:daysFull};
+  return {
+    totalZ:totalZ, totalP:totalP, totalT:totalT,
+    takenZ:takenZ, takenP:takenP, takenT:takenT,
+    totalDoses:totalDoses, takenDoses:takenDoses,
+    daysWithAny:daysWithAny, daysFull:daysFull
+  };
 }
+
 function computeReminder(pillLabel, stock, days, todayISO){
   var cumulative=0, depletionDay=null;
   for (var i=0;i<days.length;i++){
     var day = days[i];
     var amt = day.doses.filter(function(d){return d.pill===pillLabel;}).reduce(function(a,d){return a+d.amount;},0);
+    if (amt===0) continue;
     cumulative += amt;
     if (cumulative >= stock){ depletionDay = day.dayNumber; break; }
   }
   if (depletionDay===null) return null;
   var depletionDate = days[depletionDay-1].date;
-  var daysUntil = Math.round((depletionDate - dateFromISO(todayISO))/86400000);
+  var daysUntil = diffDays(depletionDate, dateFromISO(todayISO));
   var refillDay = Math.max(1, depletionDay-7);
   return {depletionDay:depletionDay, depletionDate:depletionDate, daysUntil:daysUntil, refillDay:refillDay};
 }
 
-/* ---------------- lightweight dependency-free SVG line chart ---------------- */
+/* ---------------- lightweight SVG charts ---------------- */
 function buildMoodChartSVG(entries){
   var W=320,H=190,padL=26,padR=8,padT=10,padB=22;
   var innerW=W-padL-padR, innerH=H-padT-padB;
@@ -221,21 +738,21 @@ function buildMoodChartSVG(entries){
   var ptsFeeling = entries.map(function(e,i){return x(i)+','+y(e.feeling);}).join(' ');
   var ptsMood = entries.map(function(e,i){return x(i)+','+y(e.mood);}).join(' ');
   var grid = [1,5,10].map(function(v){
-    return '<line x1="'+padL+'" y1="'+y(v)+'" x2="'+(W-padR)+'" y2="'+y(v)+'" stroke="#e5e7eb" stroke-width="1"/>'+
-           '<text x="'+(padL-5)+'" y="'+(y(v)+3)+'" font-size="9" fill="#9ca3af" text-anchor="end">'+v+'</text>';
+    return '<line x1="'+padL+'" y1="'+y(v)+'" x2="'+(W-padR)+'" y2="'+y(v)+'" stroke="var(--grid-line)" stroke-width="1"/>'+
+           '<text x="'+(padL-5)+'" y="'+(y(v)+3)+'" font-size="9" fill="var(--chart-label)" text-anchor="end">'+v+'</text>';
   }).join('');
-  var dotsF = entries.map(function(e,i){return '<circle cx="'+x(i)+'" cy="'+y(e.feeling)+'" r="2.5" fill="#3b82f6"/>';}).join('');
-  var dotsM = entries.map(function(e,i){return '<circle cx="'+x(i)+'" cy="'+y(e.mood)+'" r="2.5" fill="#f97316"/>';}).join('');
+  var dotsF = entries.map(function(e,i){return '<circle cx="'+x(i)+'" cy="'+y(e.feeling)+'" r="2.5" fill="var(--accent)"/>';}).join('');
+  var dotsM = entries.map(function(e,i){return '<circle cx="'+x(i)+'" cy="'+y(e.mood)+'" r="2.5" fill="var(--teal)"/>';}).join('');
   var step = n<=7 ? 1 : (n<=14 ? 2 : Math.ceil(n/7));
   var labels = entries.map(function(e,i){
     if (i%step!==0 && i!==n-1) return '';
     var lbl = e.date.toLocaleDateString('ru-RU',{day:'numeric',month:'numeric'});
-    return '<text x="'+x(i)+'" y="'+(H-6)+'" font-size="9" fill="#9ca3af" text-anchor="middle">'+lbl+'</text>';
+    return '<text x="'+x(i)+'" y="'+(H-6)+'" font-size="9" fill="var(--chart-label)" text-anchor="middle">'+lbl+'</text>';
   }).join('');
   return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="200" preserveAspectRatio="xMidYMid meet">'+
     grid+
-    '<polyline points="'+ptsFeeling+'" fill="none" stroke="#3b82f6" stroke-width="2"/>'+
-    '<polyline points="'+ptsMood+'" fill="none" stroke="#f97316" stroke-width="2"/>'+
+    '<polyline points="'+ptsFeeling+'" fill="none" stroke="var(--accent)" stroke-width="2"/>'+
+    '<polyline points="'+ptsMood+'" fill="none" stroke="var(--teal)" stroke-width="2"/>'+
     dotsF+dotsM+labels+
   '</svg>';
 }
@@ -250,28 +767,41 @@ function buildSleepChartSVG(entries){
   function yFor(v){ return padT + innerH - (v/maxY)*innerH; }
   var ticks = [0, Math.round(maxY/2), maxY];
   var grid = ticks.map(function(v){
-    return '<line x1="'+padL+'" y1="'+yFor(v)+'" x2="'+(W-padR)+'" y2="'+yFor(v)+'" stroke="#e5e7eb" stroke-width="1"/>'+
-           '<text x="'+(padL-5)+'" y="'+(yFor(v)+3)+'" font-size="9" fill="#9ca3af" text-anchor="end">'+v+'</text>';
+    return '<line x1="'+padL+'" y1="'+yFor(v)+'" x2="'+(W-padR)+'" y2="'+yFor(v)+'" stroke="var(--grid-line)" stroke-width="1"/>'+
+           '<text x="'+(padL-5)+'" y="'+(yFor(v)+3)+'" font-size="9" fill="var(--chart-label)" text-anchor="end">'+v+'</text>';
   }).join('');
   var barW = n>0 ? Math.min(24, (innerW/n)*0.55) : 10;
   var bars = entries.map(function(e,i){
     var bx = x(i) - barW/2;
     var by = yFor(e.sleepHours);
     var bh = Math.max(0, (padT+innerH) - by);
-    return '<rect x="'+bx+'" y="'+by+'" width="'+barW+'" height="'+bh+'" rx="3" fill="#8b5cf6"/>';
+    return '<rect x="'+bx+'" y="'+by+'" width="'+barW+'" height="'+bh+'" rx="3" fill="var(--violet)"/>';
   }).join('');
   var step = n<=7 ? 1 : (n<=14 ? 2 : Math.ceil(n/7));
   var labels = entries.map(function(e,i){
     if (i%step!==0 && i!==n-1) return '';
     var lbl = e.date.toLocaleDateString('ru-RU',{day:'numeric',month:'numeric'});
-    return '<text x="'+x(i)+'" y="'+(H-6)+'" font-size="9" fill="#9ca3af" text-anchor="middle">'+lbl+'</text>';
+    return '<text x="'+x(i)+'" y="'+(H-6)+'" font-size="9" fill="var(--chart-label)" text-anchor="middle">'+lbl+'</text>';
   }).join('');
   return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="200" preserveAspectRatio="xMidYMid meet">'+grid+bars+labels+'</svg>';
 }
 
-/* ---------------- persistence (synchronous localStorage — no network, no loader) ---------------- */
+/* ---------------- persistence ---------------- */
+function defaultTheme(){
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 function defaultData(){
-  return { startDate: isoFromDate(new Date()), taken:{}, stockZ:DEFAULT_STOCK_Z, stockA:DEFAULT_STOCK_A, moodLog:{} };
+  return {
+    theme: defaultTheme(),
+    startDate: DEFAULT_START_ISO,
+    noseStartDate: DEFAULT_START_ISO,
+    doctorVisitDate: '',
+    taken: {},
+    stockZ: DEFAULT_STOCK_Z,
+    stockP: DEFAULT_STOCK_P,
+    stockT: DEFAULT_STOCK_T,
+    moodLog: {}
+  };
 }
 function loadData(){
   try {
@@ -279,247 +809,519 @@ function loadData(){
     if (raw){
       var p = JSON.parse(raw);
       return {
-        startDate: p.startDate || isoFromDate(new Date()),
+        theme: (p.theme === 'dark' || p.theme === 'light') ? p.theme : defaultTheme(),
+        startDate: p.startDate || DEFAULT_START_ISO,
+        noseStartDate: p.noseStartDate || p.startDate || DEFAULT_START_ISO,
+        doctorVisitDate: p.doctorVisitDate || '',
         taken: p.taken || {},
         stockZ: typeof p.stockZ === 'number' ? p.stockZ : DEFAULT_STOCK_Z,
-        stockA: typeof p.stockA === 'number' ? p.stockA : DEFAULT_STOCK_A,
+        stockP: typeof p.stockP === 'number' ? p.stockP : DEFAULT_STOCK_P,
+        stockT: typeof p.stockT === 'number' ? p.stockT : DEFAULT_STOCK_T,
         moodLog: p.moodLog || {}
       };
     }
   } catch(e){ console.error('load failed', e); }
   return defaultData();
 }
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  var meta = document.getElementById('meta-theme-color');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#11161d' : '#f5f6f8');
+}
 function saveData(){
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-  catch(e){ console.error('save failed', e); alert('Не удалось сохранить в этом браузере (нет места или хранилище отключено).'); }
+  catch(e){ console.error('save failed', e); alert('Не удалось сохранить данные: нет свободного места или хранилище браузера отключено.'); }
 }
 
 var data = loadData();
-var ui = { openWeek:0, moodChartOpen:false, moodPromptDay:null, moodDraftFeeling:null, moodDraftMood:null, moodDraftSleep:null, showResetConfirm:false };
+applyTheme(data.theme);
+
+var ui = {
+  activeTab: 'today',
+  animateTab: false,
+  openWeek: 0,
+  selectedDayOffset: 0,
+  expandedSlots: {},
+  moodPromptDay: null,
+  moodDraftFeeling: null,
+  moodDraftMood: null,
+  moodDraftSleep: null,
+  moodDraftNote: '',
+  showResetConfirm: false
+};
 (function initWeek(){
-  var dayNum = Math.round((dateFromISO(isoFromDate(new Date())) - dateFromISO(data.startDate))/86400000)+1;
-  ui.openWeek = Math.min(4, Math.max(0, Math.floor((dayNum-1)/7)));
+  var totalWeeks = Math.ceil(getCourseLength(data.startDate) / 7);
+  var dayNum = diffDays(dateFromISO(isoFromDate(new Date())), dateFromISO(data.startDate)) + 1;
+  ui.openWeek = Math.min(totalWeeks - 1, Math.max(0, Math.floor((dayNum - 1) / 7)));
 })();
 
-/* ---------------- render helpers ---------------- */
-function pillLetterHTML(pillLabel){
-  var cls = pillLabel==='З' ? 'pill-text-z' : 'pill-text-a';
-  var color = pillLabel==='З' ? '#3b82f6' : '#ec4899';
-  return '<span class="'+cls+'" style="color:'+color+';font-weight:600">'+pillLabel+'</span>';
-}
-function capsuleHTML(dose, dayIso, isTaken, size){
-  var big = size==='lg';
-  var pillClass = dose.pill==='З' ? 'capsule-z' : 'capsule-a';
-  var inner = isTaken ? ICON.check : '<span class="capsule-num">'+formatNum(dose.amount)+'</span>';
-  return '<button type="button" class="capsule '+pillClass+' '+(big?'capsule-lg':'capsule-sm')+' '+(isTaken?'capsule-on':'')+
-    '" data-action="toggle-dose" data-dose-id="'+dose.id+'" data-day-iso="'+dayIso+'" data-slot="'+dose.slot+
-    '" aria-label="'+dose.pill+' '+dose.slot+' '+formatNum(dose.amount)+'">'+inner+'</button>';
+/* ---------------- ICS calendar generator ---------------- */
+function exportICS(){
+  function icsDate(d){
+    return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  }
+  var start = dateFromISO(data.startDate);
+  var noseStart = dateFromISO(data.noseStartDate);
+  var totalDays = getCourseLength(data.startDate);
+  var stamp = icsDate(new Date()) + 'T080000Z';
+  var lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//MedTrack//Course Reminders//RU',
+    'CALSCALE:GREGORIAN'
+  ];
+
+  function addRecurring(uid, d, hhmm, summary, desc, count){
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:'+uid+'@medtrack');
+    lines.push('DTSTAMP:'+stamp);
+    lines.push('DTSTART:'+icsDate(d)+'T'+hhmm+'00');
+    lines.push('DURATION:PT15M');
+    lines.push('RRULE:FREQ=DAILY;COUNT='+count);
+    lines.push('SUMMARY:'+summary);
+    lines.push('DESCRIPTION:'+desc);
+    lines.push('BEGIN:VALARM');
+    lines.push('TRIGGER:PT0M');
+    lines.push('ACTION:DISPLAY');
+    lines.push('DESCRIPTION:'+summary);
+    lines.push('END:VALARM');
+    lines.push('END:VEVENT');
+  }
+
+  function addMilestone(uid, d, summary){
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:'+uid+'@medtrack');
+    lines.push('DTSTAMP:'+stamp);
+    lines.push('DTSTART;VALUE=DATE:'+icsDate(d));
+    lines.push('DTEND;VALUE=DATE:'+icsDate(addDays(d,1)));
+    lines.push('SUMMARY:'+summary);
+    lines.push('END:VEVENT');
+  }
+
+  addRecurring('morning-z', start, '0900', 'Утро: З (1 таб после еды)', 'Основной курс лечения', totalDays);
+  addRecurring('day-p', start, '1500', 'День (до 16:00): П 250 мг', 'Второй приём П до 16:00', 60);
+  addRecurring('evening-t', start, '2100', 'Вечер (до 22:00): Т (½ таб)', 'Вечерний приём Т до 22:00', 30);
+  addRecurring('night-zodak', noseStart, '2230', 'На ночь: Зодак (1 таб)', 'Курс на 7 дней', 7);
+
+  addMilestone('end-sinupret-zodak', addDays(noseStart, 6), 'Последний день: Синупрет и Зодак (7/7)');
+  addMilestone('end-nose', addDays(noseStart, 9), 'Последний день: Промывание и Нозефрин (10/10)');
+  addMilestone('end-t', addDays(start, 29), 'Последний день курса Т (30/30)');
+  addMilestone('end-p', addDays(start, 59), 'Последний день курса П 250 мг (60/60)');
+  addMilestone('end-z', dateFromISO(COURSE_END_ISO), 'Окончание курса З');
+
+  if (data.doctorVisitDate){
+    addMilestone('doctor-visit', dateFromISO(data.doctorVisitDate), 'Визит к врачу (контроль лечения)');
+  }
+
+  lines.push('END:VCALENDAR');
+  var blob = new Blob([lines.join('\r\n')], {type:'text/calendar;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'medtrack-reminders.ics';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
-function reminderCardHTML(pillLabel, reminder, prescription){
+/* ---------------- render helpers ---------------- */
+function openCheckinModal(dayIso){
+  var existing = data.moodLog[dayIso];
+  ui.moodPromptDay = dayIso;
+  ui.moodDraftFeeling = existing && existing.feeling != null ? existing.feeling : null;
+  ui.moodDraftMood = existing && existing.mood != null ? existing.mood : null;
+  ui.moodDraftSleep = existing && existing.sleepHours != null ? existing.sleepHours : null;
+  ui.moodDraftNote = existing && existing.note ? existing.note : '';
+}
+
+function pillLetterHTML(pillLabel){
+  var m = MED_META[pillLabel] || { color:'var(--ink)' };
+  return '<span style="color:'+m.color+';font-weight:700">'+pillLabel+'</span>';
+}
+
+function timelineRowHTML(dose, dayIso, isTaken){
+  var m = MED_META[dose.pill];
+  var daysLeft = dose.courseTotal - dose.courseDay + 1;
+  var badgeStyle = 'color:'+m.color+';border-color:var(--border);';
+  return '<button type="button" class="dose-row '+(isTaken?'is-taken':'')+'" data-action="toggle-dose" data-dose-id="'+dose.id+'" data-day-iso="'+dayIso+'" data-slot="'+dose.slot+'" aria-pressed="'+isTaken+'">'+
+    '<div class="dose-badge" style="'+badgeStyle+'">'+m.short+'</div>'+
+    '<div class="dose-info">'+
+      '<div class="dose-name">'+m.name+' · '+dose.doseText+' <span class="dose-days num">день '+dose.courseDay+'/'+dose.courseTotal+'</span></div>'+
+      '<div class="dose-meta">'+dose.note+(daysLeft>1 ? ' · ост. '+daysLeft+' дн.' : ' · последний день')+'</div>'+
+    '</div>'+
+    '<div class="dose-check">'+(isTaken ? ICON.check : '')+'</div>'+
+  '</button>';
+}
+
+function reminderCardHTML(pillLabel, reminder){
   var urgent = reminder.daysUntil<=7, overdue = reminder.daysUntil<0;
   var bg = urgent ? 'bg-red' : 'bg-orange';
   var title, sub, subClass='';
   var coloredLabel = pillLetterHTML(pillLabel);
   if (overdue){
     title = 'Запас «'+coloredLabel+'», похоже, уже закончился';
-    sub = prescription ? 'Если рецепт ещё не продлён — запишитесь к врачу' : 'Пора пополнить запас';
+    sub = 'Пополните запас или скорректируйте остаток';
     subClass='urgent';
   } else if (urgent){
     title = 'Запас «'+coloredLabel+'» закончится через '+reminder.daysUntil+' дн.';
-    sub = prescription ? 'Запишитесь к врачу за новым рецептом' : 'Пора пополнить запас';
+    sub = 'Пора пополнить запас';
     subClass='urgent';
   } else {
     title = 'Запас «'+coloredLabel+'» — до дня '+reminder.depletionDay+' ('+shortDate(reminder.depletionDate)+')';
-    sub = 'Осталось ~'+reminder.daysUntil+' дн. запаса'+(prescription?' · рецептурный препарат':'');
+    sub = 'Осталось ~'+reminder.daysUntil+' дн. запаса';
   }
+  var packAmt = PACK_SIZE[pillLabel] || 30;
+  var refillBtn = '<button type="button" class="refill-btn num" data-action="add-stock" data-pill="'+pillLabel+'" data-amount="'+packAmt+'" title="Добавить пачку (+'+packAmt+')">+'+packAmt+'</button>';
   return '<div class="card reminder"><div class="reminder-icon '+bg+'">'+ICON.pill+'</div>'+
-    '<div><div class="reminder-title">'+title+'</div><div class="reminder-sub '+subClass+'">'+sub+'</div></div></div>';
+    '<div class="reminder-body"><div class="reminder-title">'+title+'</div><div class="reminder-sub '+subClass+'">'+sub+'</div></div>'+
+    refillBtn+'</div>';
 }
 
 function render(){
-  var days = generateSchedule(data.startDate);
+  applyTheme(data.theme);
+  var days = generateSchedule(data.startDate, data.noseStartDate);
+  var courseLength = days.length;
   var stats = computeStats(days, data.taken);
   var today = new Date();
   var todayISO = isoFromDate(today);
-  var currentDayNumber = Math.round((dateFromISO(todayISO) - dateFromISO(data.startDate))/86400000)+1;
-  var currentDay = days.filter(function(d){return d.iso===todayISO;})[0];
+  var activeSlotKey = getActiveSlotKey();
+  var viewDate = addDays(dateFromISO(todayISO), ui.selectedDayOffset);
+  var viewISO = isoFromDate(viewDate);
+  var viewDayNumber = diffDays(viewDate, dateFromISO(data.startDate)) + 1;
+  var currentNoseDay = diffDays(dateFromISO(todayISO), dateFromISO(data.noseStartDate)) + 1;
+  var viewDay = days.filter(function(d){return d.iso===viewISO;})[0];
   var endDate = days[days.length-1].date;
   var progressPct = stats.totalDoses>0 ? Math.round((stats.takenDoses/stats.totalDoses)*100) : 0;
-  var daysUntilVisit = Math.round((dateFromISO(DOCTOR_VISIT_ISO) - dateFromISO(todayISO))/86400000);
+
   var reminderZ = computeReminder('З', data.stockZ, days, todayISO);
-  var reminderA = computeReminder('А', data.stockA, days, todayISO);
+  var reminderP = computeReminder('П', data.stockP, days, todayISO);
+  var reminderT = computeReminder('Т', data.stockT, days, todayISO);
+
   var stockRemainingZ = data.stockZ - stats.takenZ;
-  var stockRemainingA = data.stockA - stats.takenA;
-  var warnZ = stats.totalZ > data.stockZ ? 'запаса не хватит на весь курс' : null;
-  var warnA = stats.totalA > data.stockA ? 'запаса не хватит на весь курс' : null;
+  var stockRemainingP = data.stockP - stats.takenP;
+  var stockRemainingT = data.stockT - stats.takenT;
+  var warnZ = stats.totalZ > data.stockZ ? 'не хватит на весь курс' : null;
+  var warnP = stats.totalP > data.stockP ? 'не хватит на курс (нужно '+formatNum(stats.totalP)+')' : null;
+  var warnT = stats.totalT > data.stockT ? 'не хватит на курс (нужно '+formatNum(stats.totalT)+')' : null;
 
-  var journal = Object.keys(data.taken).map(function(id){
-    for (var i=0;i<days.length;i++){
-      var dose = days[i].doses.filter(function(d){return d.id===id;})[0];
-      if (dose) return {id:id, ts:data.taken[id], day:days[i], dose:dose};
-    }
-    return null;
-  }).filter(Boolean).sort(function(a,b){return new Date(b.ts)-new Date(a.ts);}).slice(0,8);
-
-  var moodEntries = Object.keys(data.moodLog).map(function(iso){
-    var v = data.moodLog[iso];
-    if (!v || v.feeling==null || v.mood==null) return null;
-    return {iso:iso, date:dateFromISO(iso), feeling:v.feeling, mood:v.mood};
-  }).filter(Boolean).sort(function(a,b){return a.date-b.date;});
-  var avgFeeling = average(moodEntries.map(function(e){return e.feeling;}));
-  var avgMood = average(moodEntries.map(function(e){return e.mood;}));
-
-  var sleepEntries = Object.keys(data.moodLog).map(function(iso){
-    var v = data.moodLog[iso];
-    if (!v || v.sleepHours==null) return null;
-    return {iso:iso, date:dateFromISO(iso), sleepHours:v.sleepHours};
-  }).filter(Boolean).sort(function(a,b){return a.date-b.date;});
-  var avgSleep = average(sleepEntries.map(function(e){return e.sleepHours;}));
-
-  var weeks = [0,1,2,3,4].map(function(w){return days.slice(w*7, w*7+7);});
-
-  /* header */
+  var isDark = data.theme === 'dark';
   var headerHTML =
     '<div>'+
       '<div class="row-between">'+
-        '<div><h1 class="title">Курс лечения</h1><p class="sub">'+longDate(dateFromISO(data.startDate))+' – '+longDate(endDate)+'</p></div>'+
-        '<div class="toolbar">'+
-          '<button class="icon-btn" data-action="export-data" title="Экспорт (резервная копия)">'+ICON.download+'</button>'+
-          '<button class="icon-btn" data-action="trigger-import" title="Импорт из файла">'+ICON.upload+'</button>'+
-          '<button class="icon-btn" data-action="open-reset-confirm" title="Сбросить всю историю">'+ICON.reset+'</button>'+
-        '</div>'+
+        '<div><h1 class="title">Курс лечения</h1><p class="sub num">'+longDate(dateFromISO(data.startDate))+' – '+longDate(endDate)+' · '+courseLength+' дн.</p></div>'+
+        '<button type="button" class="icon-btn" data-action="toggle-theme" title="'+(isDark?'Светлая тема':'Тёмная тема (Медь)')+'" aria-label="Переключить тему">'+(isDark?ICON.sun:ICON.moon)+'</button>'+
       '</div>'+
-      '<div class="progress-row"><div class="progress-track"><div class="progress-fill" style="width:'+progressPct+'%"></div></div><span class="progress-pct">'+progressPct+'%</span></div>'+
-      '<div class="field-row">'+ICON.calendar+'<label for="start-date">Начало курса</label>'+
-        '<input id="start-date" type="date" value="'+data.startDate+'" data-field="startDate" class="ml-auto">'+
-      '</div>'+
-      '<div class="field-row"><span style="text-transform:uppercase;font-size:11px;color:var(--muted2)">Запас</span>'+
-        '<div class="stock-group"><span class="stock-label">З</span><input type="number" min="0" value="'+data.stockZ+'" data-field="stockZ"></div>'+
-        '<div class="stock-group"><span class="stock-label">А</span><input type="number" min="0" value="'+data.stockA+'" data-field="stockA"></div>'+
-      '</div>'+
-      '<p class="storage-note">Данные хранятся локально в этом браузере/устройстве. «Экспорт» — резервная копия или перенос на другое устройство.</p>'+
+      '<div class="progress-row"><div class="progress-track"><div class="progress-fill" style="transform:scaleX('+(progressPct/100)+')"></div></div><span class="progress-pct num">'+progressPct+'%</span></div>'+
     '</div>';
 
-  /* reminders */
-  var doctorSub = daysUntilVisit>0 ? ('Через '+daysUntilVisit+' дн.') : (daysUntilVisit===0 ? 'Сегодня' : 'Уже прошёл');
-  var remindersHTML =
-    '<div><div class="section-label">Напоминания</div><div style="display:flex;flex-direction:column;gap:8px">'+
-      '<div class="card reminder"><div class="reminder-icon bg-orange">'+ICON.stetho+'</div>'+
-        '<div><div class="reminder-title">Визит к врачу — 27 сентября, '+DOCTOR_VISIT_TIME+'</div><div class="reminder-sub">'+doctorSub+'</div></div></div>'+
-      (reminderA ? reminderCardHTML('А', reminderA, true) : '')+
-      (reminderZ ? reminderCardHTML('З', reminderZ, false) : '')+
-    '</div></div>';
+  var tabBodyHTML = '';
 
-  /* today card */
-  var todayInner = '';
-  if (currentDayNumber<1){
-    todayInner = '<p class="empty-note">Курс начнётся '+longDate(dateFromISO(data.startDate))+' — через '+(1-currentDayNumber)+' дн.</p>';
-  } else if (currentDayNumber>COURSE_LENGTH){
-    todayInner = '<p class="empty-note">Курс завершён '+longDate(endDate)+'. 🎉</p>';
-  } else if (currentDay){
-    var capsRow = currentDay.doses.map(function(dose){return '<div class="capsule-wrap">'+capsuleHTML(dose, currentDay.iso, !!data.taken[dose.id], 'lg')+'</div>';}).join('');
-    var tagsRow = currentDay.doses.map(function(dose){return '<div class="cap-tag">'+pillLetterHTML(dose.pill)+'·'+formatNum(dose.amount)+'</div>';}).join('');
-    todayInner =
-      '<div class="today-head"><h2>Сегодня · день '+currentDay.dayNumber+' из '+COURSE_LENGTH+'</h2><span class="today-date">'+shortDate(currentDay.date)+'</span></div>'+
-      '<div class="dose-grid">'+
-        '<div class="slot-label span2">Утро</div><div class="slot-label">День</div><div class="slot-label">Вечер</div>'+
-        capsRow+tagsRow+
-      '</div>'+
-      '<p class="today-note">Утро — после еды · Вечер — 18:00–19:00 · утренняя отметка запускает чек-ин самочувствия</p>';
-  }
-  var todayHTML = '<div class="card card-lg today-card">'+todayInner+'</div>';
+  /* TAB 1: TODAY */
+  if (ui.activeTab === 'today'){
+    var dayLabel = ui.selectedDayOffset===0 ? 'Сегодня' : (ui.selectedDayOffset===-1 ? 'Вчера' : (ui.selectedDayOffset===1 ? 'Завтра' : shortDate(viewDate)));
+    var navControls =
+      '<div class="day-nav">'+
+        (ui.selectedDayOffset!==0 ? '<button type="button" class="today-pill" data-action="day-today">Сегодня</button>' : '')+
+        '<button type="button" class="day-nav-btn" data-action="day-prev" aria-label="Предыдущий день" '+(viewDayNumber<=1?'disabled':'')+'>'+ICON.chevronLeft+'</button>'+
+        '<button type="button" class="day-nav-btn" data-action="day-next" aria-label="Следующий день" '+(viewDayNumber>=courseLength?'disabled':'')+'>'+ICON.chevronRight+'</button>'+
+      '</div>';
 
-  /* stats */
-  var statsHTML =
-    '<div><div class="section-label">Прогресс</div><div class="stats-grid">'+
-      '<div class="card stat-card"><div class="stat-value">'+formatNum(stats.takenZ)+' / '+formatNum(stats.totalZ)+'</div><div class="stat-label"><span class="dot" style="background:#3b82f6;margin-right:5px"></span>Таблетка З</div><div class="stat-sub">в наличии: '+formatNum(stockRemainingZ)+'</div>'+(warnZ?'<div class="stat-warn">'+warnZ+'</div>':'')+'</div>'+
-      '<div class="card stat-card"><div class="stat-value">'+formatNum(stats.takenA)+' / '+formatNum(stats.totalA)+'</div><div class="stat-label"><span class="dot" style="background:#ec4899;margin-right:5px"></span>Таблетка А</div><div class="stat-sub">в наличии: '+formatNum(stockRemainingA)+'</div>'+(warnA?'<div class="stat-warn">'+warnA+'</div>':'')+'</div>'+
-      '<div class="card stat-card"><div class="stat-value">'+stats.daysWithAny+' / '+COURSE_LENGTH+'</div><div class="stat-label">Дней с приёмами</div><div class="stat-sub">полностью: '+stats.daysFull+'</div></div>'+
-      '<div class="card stat-card"><div class="stat-value">'+((currentDayNumber>=1&&currentDayNumber<=COURSE_LENGTH)?(currentDayNumber+' / '+COURSE_LENGTH):'—')+'</div><div class="stat-label">День курса</div>'+((currentDayNumber>=1&&currentDayNumber<=COURSE_LENGTH)?('<div class="stat-sub">осталось дней: '+(COURSE_LENGTH-currentDayNumber+1)+'</div>'):'')+'</div>'+
-    '</div></div>';
+    var todayInner = '';
+    if (viewDayNumber < 1){
+      todayInner =
+        '<div class="today-head"><h2>'+dayLabel+'</h2>'+navControls+'</div>'+
+        '<p class="empty-note">Курс начнётся '+longDate(dateFromISO(data.startDate))+' — через '+(1-viewDayNumber)+' дн.</p>';
+    } else if (viewDayNumber > courseLength){
+      todayInner =
+        '<div class="today-head"><h2>'+dayLabel+'</h2>'+navControls+'</div>'+
+        '<p class="empty-note">Курс завершён '+longDate(endDate)+'.</p>';
+    } else if (viewDay){
+      var dayDone = viewDay.doses.filter(function(d){return !!data.taken[d.id];}).length;
+      var dayTotal = viewDay.doses.length;
+      var dayPct = Math.round((dayDone/dayTotal)*100);
+      var timelineHTML = SLOTS.map(function(slot){
+        var slotDoses = viewDay.doses.filter(function(d){return d.slot===slot.key;});
+        if (!slotDoses.length) return '';
+        var slotDone = slotDoses.filter(function(d){return !!data.taken[d.id];}).length;
+        var allDone = slotDone===slotDoses.length;
+        var isNow = ui.selectedDayOffset===0 && slot.key===activeSlotKey && !allDone;
+        var slotKeyId = viewDay.iso + ':' + slot.key;
+        var isCollapsed = allDone && !ui.expandedSlots[slotKeyId];
+        var dotCls = allDone ? 'done' : (isNow ? 'now' : (slotDone>0 ? 'partial' : ''));
+        var slotAction = slotDoses.length > 1 && !isCollapsed
+          ? '<button type="button" class="slot-all-btn" data-action="toggle-slot" data-day-iso="'+viewDay.iso+'" data-slot="'+slot.key+'">'+(allDone ? 'Снять все' : 'Отметить все')+'</button>'
+          : '';
 
-  /* weeks accordion */
-  var weeksHTML = '<div><div class="section-label">Календарь курса</div><div class="card grouped">'+
-    weeks.map(function(weekDays, w){
-      var weekTaken=0, weekTotal=0;
-      weekDays.forEach(function(d){ weekTotal+=d.doses.length; weekTaken += d.doses.filter(function(x){return data.taken[x.id];}).length; });
-      var isOpen = ui.openWeek===w;
-      var body = '';
-      if (isOpen){
-        body = '<div class="week-body">'+weekDays.map(function(day){
-          var badges='';
-          if (day.isDoctorVisit) badges += '<div class="day-badge orange">Врач · '+DOCTOR_VISIT_TIME+'</div>';
-          if (reminderA && day.dayNumber===reminderA.refillDay) badges += '<div class="day-badge red">Запись к врачу за «'+pillLetterHTML('А')+'»</div>';
-          if (reminderZ && day.dayNumber===reminderZ.refillDay) badges += '<div class="day-badge orange">Пополнить «'+pillLetterHTML('З')+'»</div>';
-          var caps = day.doses.map(function(dose){return capsuleHTML(dose, day.iso, !!data.taken[dose.id], 'sm');}).join('');
-          return '<div class="day-row"><div class="day-info"><div class="day-num">День '+day.dayNumber+'</div><div class="day-date">'+shortDate(day.date)+'</div>'+badges+'</div><div class="caps-row">'+caps+'</div></div>';
-        }).join('')+'</div>';
+        var bodyHTML = isCollapsed
+          ? '<button type="button" class="slot-collapsed-btn" data-action="toggle-slot-expand" data-slot-key="'+slotKeyId+'">'+
+              '<span style="display:flex;align-items:center;gap:8px">'+ICON.check+'<span>'+slot.title+' · <span class="num">'+slotDone+'/'+slotDoses.length+'</span> выполнено</span></span>'+
+              ICON.chevronDown+
+            '</button>'
+          : '<div class="tl-items">'+
+              slotDoses.map(function(dose){ return timelineRowHTML(dose, viewDay.iso, !!data.taken[dose.id]); }).join('')+
+            '</div>';
+
+        return '<div class="tl-slot '+(isNow?'is-now':'')+'">'+
+          '<div class="tl-dot '+dotCls+'"></div>'+
+          (!isCollapsed ? (
+            '<div class="tl-head"><div class="tl-title-group"><span class="tl-title">'+slot.title+'</span><span class="tl-time">'+slot.hint+'</span>'+
+            (isNow?'<span class="now-badge">Сейчас</span>':'')+'</div>'+slotAction+'</div>'
+          ) : '')+
+          bodyHTML+
+        '</div>';
+      }).join('');
+
+      var dayLog = data.moodLog[viewDay.iso];
+      var checkinMain = 'Чек-ин самочувствия и заметка дня';
+      var checkinSub = 'Самочувствие, настроение, сон и симптомы';
+      var checkinCTA = 'Заполнить';
+      if (dayLog && dayLog.feeling != null){
+        checkinMain = 'Самочувствие '+dayLog.feeling+'/10 · Настроение '+dayLog.mood+'/10'+(dayLog.sleepHours!=null?' · Сон '+formatNum(dayLog.sleepHours)+' ч':'');
+        checkinSub = dayLog.note ? esc(dayLog.note) : 'Добавить заметку о симптомах или самочувствии';
+        checkinCTA = 'Изменить';
+      } else if (dayLog && dayLog.note){
+        checkinMain = 'Заметка дня';
+        checkinSub = esc(dayLog.note);
+        checkinCTA = 'Изменить';
       }
-      return '<div><button class="week-head" data-action="toggle-week" data-week="'+w+'">'+
-        '<span class="week-title">Неделя '+(w+1)+' <span class="week-range">· '+shortDate(weekDays[0].date)+' – '+shortDate(weekDays[weekDays.length-1].date)+'</span></span>'+
-        '<span style="display:flex;align-items:center;gap:8px"><span class="week-count">'+weekTaken+'/'+weekTotal+'</span>'+(isOpen?ICON.chevronUp:ICON.chevronDown)+'</span>'+
-        '</button>'+body+'</div>';
-    }).join('')+
-  '</div></div>';
 
-  /* journal */
-  var journalHTML = '';
-  if (journal.length>0){
-    journalHTML = '<div><div class="section-label">Журнал приёмов</div><div class="card journal-list">'+
-      journal.map(function(entry){
-        var t = new Date(entry.ts).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-        return '<div class="journal-row"><span>День '+entry.day.dayNumber+' · '+pillLetterHTML(entry.dose.pill)+' · '+entry.dose.slot+' · '+formatNum(entry.dose.amount)+'</span><span class="journal-time">'+t+'</span></div>';
+      todayInner =
+        '<div class="today-head"><h2>'+dayLabel+' · <span class="num">день '+viewDay.dayNumber+'</span></h2>'+navControls+'</div>'+
+        '<div class="today-meta-row"><span>'+shortDate(viewDay.date)+'</span><span class="num">Выполнено: <b>'+dayDone+' из '+dayTotal+'</b> ('+dayPct+'%)</span></div>'+
+        '<div class="timeline">'+timelineHTML+'</div>'+
+        '<button type="button" class="checkin-bar" data-action="open-checkin" data-day-iso="'+viewDay.iso+'">'+
+          '<div style="min-width:0"><div class="checkin-main num">'+checkinMain+'</div><div class="checkin-sub">'+checkinSub+'</div></div>'+
+          '<span class="checkin-cta">'+checkinCTA+'</span>'+
+        '</button>'+
+        '<p class="today-note">Промывание носа делаем перед Нозефрином</p>';
+    }
+    tabBodyHTML = '<div class="card card-lg today-card" id="today-card">'+todayInner+'</div>';
+  }
+
+  /* TAB 2: COURSES & CALENDAR */
+  else if (ui.activeTab === 'courses'){
+    var doctorCard = '';
+    if (data.doctorVisitDate){
+      var dVisit = dateFromISO(data.doctorVisitDate);
+      var dUntil = diffDays(dVisit, dateFromISO(todayISO));
+      var dSub = dUntil > 0 ? 'Через '+dUntil+' дн.' : (dUntil === 0 ? 'Сегодня' : 'Уже прошёл');
+      doctorCard = '<div class="card reminder"><div class="reminder-icon bg-blue">'+ICON.stetho+'</div>'+
+        '<div class="reminder-body"><div class="reminder-title">Визит к врачу · '+longDate(dVisit)+'</div><div class="reminder-sub">'+dSub+'</div></div></div>';
+    }
+    var noseSummary = '';
+    if (currentNoseDay >= 1 && currentNoseDay <= 10){
+      var left7 = Math.max(0, 7 - currentNoseDay + 1);
+      var left10 = 10 - currentNoseDay + 1;
+      noseSummary = '<div class="card reminder"><div class="reminder-icon bg-teal">'+ICON.drop+'</div>'+
+        '<div class="reminder-body"><div class="reminder-title">Лечение носа · <span class="num">день '+currentNoseDay+' из 10</span></div>'+
+        '<div class="reminder-sub">'+(left7>0 ? 'Синупрет и Зодак: ост. '+left7+' дн. · ' : 'Синупрет и Зодак завершены · ')+'Промывание и Нозефрин: ост. '+left10+' дн.</div></div></div>';
+    }
+    var remindersHTML =
+      '<div><div class="section-label">Активные курсы и запасы</div><div style="display:flex;flex-direction:column;gap:8px">'+
+        doctorCard+noseSummary+
+        (reminderZ ? reminderCardHTML('З', reminderZ) : '')+
+        (reminderP ? reminderCardHTML('П', reminderP) : '')+
+        (reminderT ? reminderCardHTML('Т', reminderT) : '')+
+      '</div></div>';
+
+    var statsHTML =
+      '<div><div class="section-label">Прогресс</div><div class="stats-grid">'+
+        '<div class="card stat-card"><div class="stat-value num">'+formatNum(stats.takenZ)+' / '+formatNum(stats.totalZ)+'</div><div class="stat-label"><span class="dot" style="background:'+MED_META['З'].color+'"></span>Таблетка З (до фев 27)</div><div class="stat-sub num">в наличии: '+formatNum(stockRemainingZ)+'</div>'+(warnZ?'<div class="stat-warn">'+warnZ+'</div>':'')+'</div>'+
+        '<div class="card stat-card"><div class="stat-value num">'+formatNum(stats.takenP)+' / '+formatNum(stats.totalP)+'</div><div class="stat-label"><span class="dot" style="background:'+MED_META['П'].color+'"></span>П 250 мг (2 мес)</div><div class="stat-sub num">в наличии: '+formatNum(stockRemainingP)+'</div>'+(warnP?'<div class="stat-warn">'+warnP+'</div>':'')+'</div>'+
+        '<div class="card stat-card"><div class="stat-value num">'+formatNum(stats.takenT)+' / '+formatNum(stats.totalT)+'</div><div class="stat-label"><span class="dot" style="background:'+MED_META['Т'].color+'"></span>Таблетка Т (1 мес)</div><div class="stat-sub num">в наличии: '+formatNum(stockRemainingT)+'</div>'+(warnT?'<div class="stat-warn">'+warnT+'</div>':'')+'</div>'+
+        '<div class="card stat-card"><div class="stat-value num">'+stats.daysWithAny+' / '+courseLength+'</div><div class="stat-label">Дней с приёмами</div><div class="stat-sub num">полностью: '+stats.daysFull+'</div></div>'+
+      '</div></div>';
+
+    var weeks = [];
+    for (var w=0; w<days.length; w+=7) weeks.push(days.slice(w, w+7));
+    var weeksHTML = '<div><div class="section-label">Календарь курса</div><div class="card grouped">'+
+      weeks.map(function(weekDays, w){
+        var weekTaken=0, weekTotal=0;
+        weekDays.forEach(function(d){ weekTotal+=d.doses.length; weekTaken += d.doses.filter(function(x){return data.taken[x.id];}).length; });
+        var isOpen = ui.openWeek===w;
+        var body = '';
+        if (isOpen){
+          body = '<div class="week-body">'+weekDays.map(function(day){
+            var badges='';
+            if (data.doctorVisitDate && day.iso===data.doctorVisitDate) badges += '<div class="day-badge orange">Визит к врачу</div>';
+            if (reminderZ && day.dayNumber===reminderZ.refillDay) badges += '<div class="day-badge orange">Пополнить «З»</div>';
+            if (reminderP && day.dayNumber===reminderP.refillDay) badges += '<div class="day-badge orange">Пополнить «П»</div>';
+            if (reminderT && day.dayNumber===reminderT.refillDay) badges += '<div class="day-badge orange">Пополнить «Т»</div>';
+
+            var dDone = day.doses.filter(function(x){return !!data.taken[x.id];}).length;
+            var dTotal = day.doses.length;
+            var mainPills = ['З','П','Т'].map(function(p){
+              var pDoses = day.doses.filter(function(x){return x.pill===p;});
+              if (!pDoses.length) return '';
+              var pDone = pDoses.every(function(x){return !!data.taken[x.id];});
+              var m = MED_META[p];
+              var st = pDone
+                ? 'background:'+m.color+';border-color:'+m.color+';color:var(--on-accent);'
+                : 'background:var(--card);border-color:var(--border);color:'+m.color+';';
+              return '<span class="med-pip" style="'+st+'">'+m.short+'</span>';
+            }).join('');
+
+            return '<button type="button" class="day-row '+(day.iso===todayISO?'is-today':'')+' '+(day.iso===viewISO?'is-selected':'')+'" data-action="select-day" data-day-iso="'+day.iso+'">'+
+              '<div class="day-info"><div class="day-num num">День '+day.dayNumber+'</div><div class="day-date">'+shortDate(day.date)+'</div>'+badges+'</div>'+
+              '<div class="day-right"><div class="day-dots">'+mainPills+'</div><span class="day-ratio num '+(dDone===dTotal?'done':'')+'">'+dDone+'/'+dTotal+'</span></div>'+
+            '</button>';
+          }).join('')+'</div>';
+        }
+        return '<div><button type="button" class="week-head" data-action="toggle-week" data-week="'+w+'" aria-expanded="'+isOpen+'">'+
+          '<span class="week-title">Неделя '+(w+1)+' <span class="week-range">· '+shortDate(weekDays[0].date)+' – '+shortDate(weekDays[weekDays.length-1].date)+'</span></span>'+
+          '<span style="display:flex;align-items:center;gap:8px"><span class="week-count num">'+weekTaken+'/'+weekTotal+'</span>'+(isOpen?ICON.chevronUp:ICON.chevronDown)+'</span>'+
+          '</button>'+body+'</div>';
       }).join('')+
     '</div></div>';
+
+    tabBodyHTML = remindersHTML + statsHTML + weeksHTML;
   }
 
-  /* mood chart (hidden section, collapsed by default) */
-  var chartBody = '';
-  if (moodEntries.length===0){
-    chartBody = '<p class="empty-note" style="color:var(--muted2)">Пока нет данных. Чек-ин появится при первой отметке утренней таблетки.</p>';
-  } else {
-    chartBody = '<div class="chart-avg"><span>Ср. самочувствие: <b>'+formatNum(avgFeeling)+'</b></span><span>Ср. настроение: <b>'+formatNum(avgMood)+'</b></span></div>'+
-      '<div class="legend"><span><i class="dot" style="background:#3b82f6"></i>Самочувствие</span><span><i class="dot" style="background:#f97316"></i>Настроение</span></div>'+
-      buildMoodChartSVG(moodEntries);
+  /* TAB 3: JOURNAL & DYNAMICS */
+  else if (ui.activeTab === 'journal'){
+    var moodEntries = Object.keys(data.moodLog).map(function(iso){
+      var v = data.moodLog[iso];
+      if (!v || v.feeling==null || v.mood==null) return null;
+      return {iso:iso, date:dateFromISO(iso), feeling:v.feeling, mood:v.mood, note:v.note||'', sleepHours:v.sleepHours};
+    }).filter(Boolean).sort(function(a,b){return a.date-b.date;});
+    var avgFeeling = average(moodEntries.map(function(e){return e.feeling;}));
+    var avgMood = average(moodEntries.map(function(e){return e.mood;}));
+
+    var sleepEntries = Object.keys(data.moodLog).map(function(iso){
+      var v = data.moodLog[iso];
+      if (!v || v.sleepHours==null) return null;
+      return {iso:iso, date:dateFromISO(iso), sleepHours:v.sleepHours};
+    }).filter(Boolean).sort(function(a,b){return a.date-b.date;});
+    var avgSleep = average(sleepEntries.map(function(e){return e.sleepHours;}));
+
+    var chartBody = moodEntries.length===0
+      ? '<p class="empty-note">Пока нет данных. Нажмите «Чек-ин» в разделе «Сегодня» или отметьте утренний приём.</p>'
+      : '<div class="chart-avg"><span>Ср. самочувствие: <b class="num">'+formatNum(avgFeeling)+'</b></span><span>Ср. настроение: <b class="num">'+formatNum(avgMood)+'</b></span></div>'+
+        '<div class="legend"><span><i class="dot" style="background:var(--accent)"></i>Самочувствие</span><span><i class="dot" style="background:var(--teal)"></i>Настроение</span></div>'+
+        buildMoodChartSVG(moodEntries);
+
+    var sleepBody = sleepEntries.length===0
+      ? '<p class="empty-note">Пока нет данных о сне.</p>'
+      : '<div class="chart-avg"><span>Ср. сон: <b class="num">'+formatNum(avgSleep)+' ч</b></span></div>'+buildSleepChartSVG(sleepEntries);
+
+    var notesList = Object.keys(data.moodLog).map(function(iso){
+      var v = data.moodLog[iso];
+      if (!v || (!v.note && v.feeling==null)) return null;
+      return {iso:iso, date:dateFromISO(iso), feeling:v.feeling, mood:v.mood, sleepHours:v.sleepHours, note:v.note||''};
+    }).filter(Boolean).sort(function(a,b){return b.date-a.date;}).slice(0,10);
+
+    var notesHTML = '<div><div class="section-label">Дневник самочувствия</div><div class="card journal-list">'+
+      (notesList.length===0
+        ? '<div style="padding:12px 0"><p class="empty-note">Заметок пока нет.</p></div>'
+        : notesList.map(function(item){
+            var score = item.feeling!=null ? ('Самочувствие '+item.feeling+'/10 · Настр. '+item.mood+'/10'+(item.sleepHours!=null?' · '+formatNum(item.sleepHours)+' ч':'')) : '';
+            return '<div class="note-entry"><div class="note-entry-head"><span>'+shortDate(item.date)+'</span><span class="note-entry-scores num">'+score+'</span></div>'+
+              (item.note ? '<div class="note-entry-text">'+esc(item.note)+'</div>' : '')+'</div>';
+          }).join('')
+      )+'</div></div>';
+
+    var journal = Object.keys(data.taken).map(function(id){
+      for (var i=0;i<days.length;i++){
+        var dose = days[i].doses.filter(function(d){return d.id===id;})[0];
+        if (dose) return {id:id, ts:data.taken[id], day:days[i], dose:dose};
+      }
+      return null;
+    }).filter(Boolean).sort(function(a,b){return new Date(b.ts)-new Date(a.ts);}).slice(0,12);
+
+    var journalHTML = '<div><div class="section-label">Последние отметки приёма</div><div class="card journal-list">'+
+      (journal.length===0
+        ? '<div style="padding:12px 0"><p class="empty-note">Отметок приёма пока нет.</p></div>'
+        : journal.map(function(entry){
+            var t = new Date(entry.ts).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+            return '<div class="journal-row"><span>День '+entry.day.dayNumber+' · '+pillLetterHTML(entry.dose.pill)+' · '+entry.dose.slot+' · '+entry.dose.doseText+'</span><span class="journal-time num">'+t+'</span></div>';
+          }).join('')
+      )+'</div></div>';
+
+    tabBodyHTML =
+      '<div><div class="section-label">Самочувствие и настроение</div><div class="card" style="padding:16px">'+chartBody+'</div></div>'+
+      '<div><div class="section-label">Сон</div><div class="card" style="padding:16px">'+sleepBody+'</div></div>'+
+      notesHTML + journalHTML;
   }
-  var sleepBody = '';
-  if (sleepEntries.length===0){
-    sleepBody = '<p class="empty-note" style="color:var(--muted2)">Пока нет данных о сне.</p>';
-  } else {
-    sleepBody = '<div class="chart-avg"><span>Ср. сон: <b>'+formatNum(avgSleep)+' ч</b></span></div>'+buildSleepChartSVG(sleepEntries);
+
+  /* TAB 4: MORE / SETTINGS */
+  else if (ui.activeTab === 'more'){
+    tabBodyHTML =
+      '<div><div class="section-label">Внешний вид и курс</div><div class="card settings-card">'+
+        '<div class="field-row"><span>Тема оформления</span>'+
+          '<div class="seg-control ml-auto">'+
+            '<button type="button" class="seg-btn '+(data.theme==='light'?'is-active':'')+'" data-action="set-theme" data-theme-val="light">Светлая</button>'+
+            '<button type="button" class="seg-btn '+(data.theme==='dark'?'is-active':'')+'" data-action="set-theme" data-theme-val="dark">Тёмная (Медь)</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="field-row">'+ICON.calendar+'<label for="start-date">Старт основного курса</label>'+
+          '<input id="start-date" type="date" value="'+data.startDate+'" data-field="startDate" class="ml-auto">'+
+        '</div>'+
+        '<div class="field-row">'+ICON.calendar+'<label for="nose-date">Старт лечения носа</label>'+
+          '<input id="nose-date" type="date" value="'+data.noseStartDate+'" data-field="noseStartDate" class="ml-auto">'+
+        '</div>'+
+        '<div class="field-row">'+ICON.calendar+'<label for="doctor-date">Визит к врачу (опц.)</label>'+
+          '<input id="doctor-date" type="date" value="'+esc(data.doctorVisitDate)+'" data-field="doctorVisitDate" class="ml-auto">'+
+        '</div>'+
+        '<div class="field-row"><span style="font-weight:500;color:var(--ink)">Запас таблеток</span>'+
+          '<div class="ml-auto" style="display:flex;gap:10px;flex-wrap:wrap">'+
+            '<div class="stock-group"><span class="stock-label" style="color:'+MED_META['З'].color+'">З</span><input type="number" min="0" value="'+data.stockZ+'" data-field="stockZ" aria-label="Запас З"></div>'+
+            '<div class="stock-group"><span class="stock-label" style="color:'+MED_META['П'].color+'">П</span><input type="number" min="0" value="'+data.stockP+'" data-field="stockP" aria-label="Запас П"></div>'+
+            '<div class="stock-group"><span class="stock-label" style="color:'+MED_META['Т'].color+'">Т</span><input type="number" min="0" value="'+data.stockT+'" data-field="stockT" aria-label="Запас Т"></div>'+
+          '</div>'+
+        '</div>'+
+      '</div></div>'+
+
+      '<div><div class="section-label">Напоминания и данные</div><div style="display:flex;flex-direction:column;gap:8px">'+
+        '<button type="button" class="action-btn primary" data-action="export-ics">'+ICON.calendar+'Добавить напоминания в Календарь (.ics)</button>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+          '<button type="button" class="action-btn" data-action="export-data">'+ICON.download+'Экспорт JSON</button>'+
+          '<button type="button" class="action-btn" data-action="trigger-import">'+ICON.upload+'Импорт JSON</button>'+
+        '</div>'+
+        '<button type="button" class="action-btn danger" data-action="open-reset-confirm">'+ICON.reset+'Сбросить всю историю</button>'+
+      '</div></div>'+
+
+      '<p class="storage-note">Все данные хранятся локально в этом браузере. Используйте «Экспорт JSON» для резервной копии или переноса на другое устройство.</p>';
   }
-  var moodChartHTML = '<div><button class="card chart-toggle" data-action="toggle-mood-chart" style="width:100%">'+
-    '<span class="week-title">Динамика самочувствия и сна</span>'+(ui.moodChartOpen?ICON.chevronUp:ICON.chevronDown)+
-    '</button>'+(ui.moodChartOpen ? (
-      '<div class="card" style="margin-top:8px;padding:16px">'+chartBody+'</div>'+
-      '<div class="card" style="margin-top:8px;padding:16px"><div class="section-label" style="margin-bottom:10px">Сон</div>'+sleepBody+'</div>'
-    ) : '')+'</div>';
+
+  /* update persistent floating bottom nav (preserves CSS spring slide!) */
+  var activeIdx = Math.max(0, TABS.map(function(t){return t.key;}).indexOf(ui.activeTab));
+  var ind = document.getElementById('nav-indicator');
+  if (ind) ind.style.transform = 'translateX('+(activeIdx*100)+'%)';
+  document.querySelectorAll('#bottom-nav .nav-item').forEach(function(btn){
+    var isAct = btn.dataset.tab === ui.activeTab;
+    btn.classList.toggle('is-active', isAct);
+    btn.setAttribute('aria-selected', isAct ? 'true' : 'false');
+  });
+
+  var panelClass = 'tab-panel' + (ui.animateTab ? ' animate-in' : '');
+  ui.animateTab = false;
 
   var appHTML =
     '<div class="page"><div class="container">'+
-      headerHTML+remindersHTML+todayHTML+statsHTML+weeksHTML+journalHTML+moodChartHTML+
-    '</div>'+
+      headerHTML+
+      '<div class="'+panelClass+'">'+tabBodyHTML+'</div>'+
+    '</div></div>'+
 
     (ui.moodPromptDay ?
-      '<div class="overlay"><div class="modal">'+
-        '<div><h3>Утренний чек-ин</h3><p class="sub">'+longDate(dateFromISO(ui.moodPromptDay))+'</p></div>'+
-        '<div><p class="scale-label">Как ты себя чувствуешь сегодня?</p><div class="scale-grid">'+
-          [1,2,3,4,5,6,7,8,9,10].map(function(n){return '<button type="button" class="scale-btn'+(ui.moodDraftFeeling===n?' selected':'')+'" data-action="scale-select" data-question="feeling" data-value="'+n+'">'+n+'</button>';}).join('')+
+      '<div class="overlay" data-action="backdrop-mood" role="dialog" aria-modal="true" aria-labelledby="mood-modal-title"><div class="modal" onclick="event.stopPropagation()">'+
+        '<div><h3 id="mood-modal-title">Чек-ин дня</h3><p class="sub">'+longDate(dateFromISO(ui.moodPromptDay))+'</p></div>'+
+        '<div><p class="scale-label">Как ты себя чувствуешь?</p><div class="scale-grid">'+
+          [1,2,3,4,5,6,7,8,9,10].map(function(n){return '<button type="button" class="scale-btn num'+(ui.moodDraftFeeling===n?' selected':'')+'" data-action="scale-select" data-question="feeling" data-value="'+n+'">'+n+'</button>';}).join('')+
         '</div></div>'+
-        '<div><p class="scale-label">Какое у тебя настроение с утра?</p><div class="scale-grid">'+
-          [1,2,3,4,5,6,7,8,9,10].map(function(n){return '<button type="button" class="scale-btn'+(ui.moodDraftMood===n?' selected':'')+'" data-action="scale-select" data-question="mood" data-value="'+n+'">'+n+'</button>';}).join('')+
+        '<div><p class="scale-label">Какое настроение?</p><div class="scale-grid">'+
+          [1,2,3,4,5,6,7,8,9,10].map(function(n){return '<button type="button" class="scale-btn num'+(ui.moodDraftMood===n?' selected':'')+'" data-action="scale-select" data-question="mood" data-value="'+n+'">'+n+'</button>';}).join('')+
         '</div></div>'+
-        '<div><p class="scale-label">Сколько часов ты спал(а) сегодня?</p>'+
+        '<div><p class="scale-label">Сколько часов спал(а)?</p>'+
           '<div class="sleep-row"><input type="number" step="0.5" min="0" max="24" inputmode="decimal" class="sleep-input" placeholder="напр. 7.5" data-mood-field="sleepHours" value="'+(ui.moodDraftSleep!=null?ui.moodDraftSleep:'')+'"><span class="sleep-unit">часов (необязательно)</span></div>'+
         '</div>'+
-        '<div class="modal-actions"><button type="button" class="btn-flat btn-secondary" data-action="mood-skip">Пропустить</button>'+
+        '<div><p class="scale-label">Заметка для себя / врача</p>'+
+          '<textarea class="note-input" data-mood-field="note" placeholder="Симптомы, нос, сон, реакция (необязательно)">'+esc(ui.moodDraftNote||'')+'</textarea>'+
+        '</div>'+
+        '<div class="modal-actions"><button type="button" class="btn-flat btn-secondary" data-action="mood-skip">Закрыть</button>'+
         '<button type="button" class="btn-flat btn-primary" data-action="mood-save" '+((ui.moodDraftFeeling==null||ui.moodDraftMood==null)?'disabled':'')+'>Сохранить</button></div>'+
       '</div></div>' : '')+
 
     (ui.showResetConfirm ?
-      '<div class="overlay"><div class="modal">'+
-        '<div><h3>Стереть всю историю?</h3><p class="sub">Удалятся все отметки приёма и чек-ины самочувствия (график тоже очистится). Это действие нельзя отменить.</p></div>'+
+      '<div class="overlay" data-action="backdrop-reset" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title"><div class="modal" onclick="event.stopPropagation()">'+
+        '<div><h3 id="reset-modal-title">Стереть всю историю?</h3><p class="sub">Удалятся все отметки приёма и чек-ины самочувствия (график тоже очистится). Это действие нельзя отменить.</p></div>'+
         '<div class="modal-actions"><button type="button" class="btn-flat btn-secondary" data-action="close-reset-confirm">Отмена</button>'+
         '<button type="button" class="btn-flat btn-danger" data-action="confirm-reset">Стереть всё</button></div>'+
       '</div></div>' : '');
@@ -537,29 +1339,101 @@ function exportData(){
   URL.revokeObjectURL(url);
 }
 
-/* ---------------- event delegation (attached once; survives re-renders) ---------------- */
+/* ---------------- event delegation ---------------- */
+document.getElementById('bottom-nav').addEventListener('click', function(e){
+  var el = e.target.closest('[data-tab]');
+  if (!el) return;
+  var nextTab = el.dataset.tab;
+  if (nextTab && nextTab !== ui.activeTab){
+    ui.activeTab = nextTab;
+    ui.animateTab = true;
+    render();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+});
+
 document.getElementById('app').addEventListener('click', function(e){
   var el = e.target.closest('[data-action]');
   if (!el) return;
   var action = el.dataset.action;
-  if (action==='toggle-dose'){
+  if (action==='switch-tab'){
+    var nextTab = el.dataset.tab;
+    if (nextTab && nextTab !== ui.activeTab){
+      ui.activeTab = nextTab;
+      ui.animateTab = true;
+      render();
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+  } else if (action==='toggle-dose'){
     var doseId = el.dataset.doseId, dayIso = el.dataset.dayIso, slot = el.dataset.slot;
     var willBeTaken = !data.taken[doseId];
     if (data.taken[doseId]) delete data.taken[doseId]; else data.taken[doseId] = new Date().toISOString();
     saveData();
     if (willBeTaken && slot==='Утро' && !data.moodLog[dayIso]){
-      ui.moodPromptDay = dayIso; ui.moodDraftFeeling = null; ui.moodDraftMood = null; ui.moodDraftSleep = null;
+      openCheckinModal(dayIso);
     }
     render();
+  } else if (action==='toggle-slot'){
+    var dayIso = el.dataset.dayIso, slot = el.dataset.slot;
+    var days = generateSchedule(data.startDate, data.noseStartDate);
+    var day = days.filter(function(d){return d.iso===dayIso;})[0];
+    if (!day) return;
+    var slotDoses = day.doses.filter(function(d){return d.slot===slot;});
+    var allDone = slotDoses.every(function(d){return !!data.taken[d.id];});
+    var nowISO = new Date().toISOString();
+    slotDoses.forEach(function(d){
+      if (allDone) delete data.taken[d.id];
+      else if (!data.taken[d.id]) data.taken[d.id] = nowISO;
+    });
+    saveData();
+    if (!allDone && slot==='Утро' && !data.moodLog[dayIso]){
+      openCheckinModal(dayIso);
+    }
+    render();
+  } else if (action==='toggle-slot-expand'){
+    var sk = el.dataset.slotKey;
+    ui.expandedSlots[sk] = !ui.expandedSlots[sk];
+    render();
+  } else if (action==='toggle-theme'){
+    data.theme = data.theme === 'dark' ? 'light' : 'dark';
+    saveData(); render();
+  } else if (action==='set-theme'){
+    var tv = el.dataset.themeVal;
+    if (tv==='light' || tv==='dark'){
+      data.theme = tv; saveData(); render();
+    }
+  } else if (action==='open-checkin'){
+    openCheckinModal(el.dataset.dayIso);
+    render();
+  } else if (action==='add-stock'){
+    var pill = el.dataset.pill, amt = Number(el.dataset.amount)||0;
+    if (pill==='З') data.stockZ += amt;
+    else if (pill==='П') data.stockP += amt;
+    else if (pill==='Т') data.stockT += amt;
+    saveData(); render();
+  } else if (action==='select-day'){
+    var targetISO = el.dataset.dayIso;
+    var todayISO = isoFromDate(new Date());
+    ui.selectedDayOffset = diffDays(dateFromISO(targetISO), dateFromISO(todayISO));
+    ui.activeTab = 'today';
+    ui.animateTab = true;
+    render();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  } else if (action==='day-prev'){
+    ui.selectedDayOffset--; render();
+  } else if (action==='day-next'){
+    ui.selectedDayOffset++; render();
+  } else if (action==='day-today'){
+    ui.selectedDayOffset = 0; render();
+  } else if (action==='export-ics'){
+    exportICS();
   } else if (action==='toggle-week'){
     var w = Number(el.dataset.week);
     ui.openWeek = ui.openWeek===w ? -1 : w;
     render();
-  } else if (action==='toggle-mood-chart'){
-    ui.moodChartOpen = !ui.moodChartOpen; render();
   } else if (action==='open-reset-confirm'){
     ui.showResetConfirm = true; render();
-  } else if (action==='close-reset-confirm'){
+  } else if (action==='close-reset-confirm' || action==='backdrop-reset'){
     ui.showResetConfirm = false; render();
   } else if (action==='confirm-reset'){
     data.taken = {}; data.moodLog = {}; saveData(); ui.showResetConfirm = false; render();
@@ -574,11 +1448,21 @@ document.getElementById('app').addEventListener('click', function(e){
       var sn = parseFloat(ui.moodDraftSleep);
       if (!isNaN(sn) && sn >= 0) sleepVal = sn;
     }
-    data.moodLog[ui.moodPromptDay] = {feeling:ui.moodDraftFeeling, mood:ui.moodDraftMood, sleepHours:sleepVal, ts:new Date().toISOString()};
+    var noteVal = (ui.moodDraftNote || '').trim();
+    data.moodLog[ui.moodPromptDay] = {
+      feeling: ui.moodDraftFeeling,
+      mood: ui.moodDraftMood,
+      sleepHours: sleepVal,
+      note: noteVal,
+      ts: new Date().toISOString()
+    };
     saveData(); ui.moodPromptDay = null; render();
-  } else if (action==='mood-skip'){
-    data.moodLog[ui.moodPromptDay] = {feeling:null, mood:null, sleepHours:null, skipped:true, ts:new Date().toISOString()};
-    saveData(); ui.moodPromptDay = null; render();
+  } else if (action==='mood-skip' || action==='backdrop-mood'){
+    if (!data.moodLog[ui.moodPromptDay]){
+      data.moodLog[ui.moodPromptDay] = {feeling:null, mood:null, sleepHours:null, note:'', skipped:true, ts:new Date().toISOString()};
+      saveData();
+    }
+    ui.moodPromptDay = null; render();
   } else if (action==='export-data'){
     exportData();
   } else if (action==='trigger-import'){
@@ -586,21 +1470,31 @@ document.getElementById('app').addEventListener('click', function(e){
   }
 });
 
+document.addEventListener('keydown', function(e){
+  if (e.key !== 'Escape') return;
+  if (ui.showResetConfirm){ ui.showResetConfirm = false; render(); }
+  else if (ui.moodPromptDay){ ui.moodPromptDay = null; render(); }
+});
+
 document.getElementById('app').addEventListener('change', function(e){
   var el = e.target.closest('[data-field]');
   if (!el) return;
   var field = el.dataset.field;
   if (field==='startDate'){ if (!el.value) return; data.startDate = el.value; }
+  else if (field==='noseStartDate'){ if (!el.value) return; data.noseStartDate = el.value; }
+  else if (field==='doctorVisitDate'){ data.doctorVisitDate = el.value || ''; }
   else if (field==='stockZ'){ data.stockZ = Math.max(0, Number(el.value)||0); }
-  else if (field==='stockA'){ data.stockA = Math.max(0, Number(el.value)||0); }
+  else if (field==='stockP'){ data.stockP = Math.max(0, Number(el.value)||0); }
+  else if (field==='stockT'){ data.stockT = Math.max(0, Number(el.value)||0); }
   saveData(); render();
 });
 
-// sleep-hours field: track keystrokes without re-rendering, so typing doesn't lose focus/cursor
 document.getElementById('app').addEventListener('input', function(e){
-  var el = e.target.closest('[data-mood-field="sleepHours"]');
+  var el = e.target.closest('[data-mood-field]');
   if (!el) return;
-  ui.moodDraftSleep = el.value;
+  var mf = el.dataset.moodField;
+  if (mf==='sleepHours') ui.moodDraftSleep = el.value;
+  else if (mf==='note') ui.moodDraftNote = el.value;
 });
 
 document.getElementById('import-file').addEventListener('change', function(e){
@@ -613,10 +1507,14 @@ document.getElementById('import-file').addEventListener('change', function(e){
       if (!parsed || typeof parsed !== 'object') throw new Error('bad shape');
       if (!confirm('Заменить текущие данные данными из файла? Текущий прогресс в этом браузере будет перезаписан.')) return;
       data = {
-        startDate: parsed.startDate || isoFromDate(new Date()),
+        theme: (parsed.theme === 'dark' || parsed.theme === 'light') ? parsed.theme : data.theme,
+        startDate: parsed.startDate || DEFAULT_START_ISO,
+        noseStartDate: parsed.noseStartDate || parsed.startDate || DEFAULT_START_ISO,
+        doctorVisitDate: parsed.doctorVisitDate || '',
         taken: parsed.taken || {},
         stockZ: typeof parsed.stockZ === 'number' ? parsed.stockZ : DEFAULT_STOCK_Z,
-        stockA: typeof parsed.stockA === 'number' ? parsed.stockA : DEFAULT_STOCK_A,
+        stockP: typeof parsed.stockP === 'number' ? parsed.stockP : DEFAULT_STOCK_P,
+        stockT: typeof parsed.stockT === 'number' ? parsed.stockT : DEFAULT_STOCK_T,
         moodLog: parsed.moodLog || {}
       };
       saveData(); render();
